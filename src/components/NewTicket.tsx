@@ -64,37 +64,42 @@ const NewTicket = () => {
       (queue) => queue.name === data.queue.name
     );
 
-    ticketCreate({
-      SessionID: sessionID,
-      Ticket: {
-        Type: data.type.name,
-        Title: data.title,
-        Queue: queueFormat?.data,
-        Lock: "unlock",
-        CustomerUser: emailUser,
-        State: "new",
-        Priority: "3 عادی",
-        OwnerID: 1,
-      },
-      Article: {
-        ArticleTypeID: 1,
-        SenderTypeID: 1,
-        Subject: data.title,
-        Body: data.description,
-        ContentType: "text/plain; charset=utf8",
-        Charset: "utf8",
-        MimeType: "text/plain",
-        From: emailUser,
-        Attachment: {
-          Content: "Dear customer,",
-          ContentType: "text/plain",
-          Filename: "a.txt",
-        },
-      },
-    }).then((res) => {
-      navigate("/myticket");
-      console.log(res);
-    });
+    var reader = new FileReader();
+    reader.readAsDataURL(data.file);
+    reader.onload = function () {
+      // ticketCreate({
+      //   SessionID: sessionID,
+      //   Ticket: {
+      //     Type: data.type.name,
+      //     Title: data.title,
+      //     Queue: queueFormat?.data,
+      //     Lock: "unlock",
+      //     CustomerUser: emailUser,
+      //     State: "new",
+      //     Priority: "3 عادی",
+      //     OwnerID: 1,
+      //   },
+      //   Article: {
+      //     ArticleTypeID: 1,
+      //     SenderTypeID: 1,
+      //     Subject: data.title,
+      //     Body: data.description,
+      //     ContentType: "text/plain; charset=utf8",
+      //     Charset: "utf8",
+      //     MimeType: "text/plain",
+      //     From: emailUser,
+      //     Attachment: {
+      //       Content: reader.result,
+      //       ContentType: data.file.type,
+      //       Filename: data.file.name,
+      //     },
+      //   },
+      // }).then((res) => {
+      //   navigate("/myticket");
+      //   console.log(res);
+      // });
+      console.log(reader.result);
+    };
   };
 
   return (
@@ -244,35 +249,63 @@ const NewTicket = () => {
             <Controller
               name="file"
               control={control}
-              rules={{ required: "priority is required." }}
-              render={({ field }) => (
-                <FileUpload
-                  id={field.name}
-                  name="file"
-                  url={"/api/upload"}
-                  multiple
-                  accept="image/*"
-                  maxFileSize={1000000}
-                  emptyTemplate={
-                    <p className="m-0">
-                      Drag and drop files to here to upload.
-                    </p>
-                  }
-                  pt={{
-                    buttonbar:{className:"w-full min-h-12 flex items-center space-x-4 mb-4"},
-                    chooseButton:{className:"px-4 py-2 ml-4"},
-                    chooseButtonLabel:{className:"px-2"},
-                    uploadButton:{root:{className:"px-4 py-2 ml-4"},label:{className:"px-2"}},
-                    cancelButton:{root:{className:"px-4 py-2 ml-4"},label:{className:"px-2"}},
-                    message:{root:{className:"px-4"}},
-                    content:{className:"w-full p-4 felx justify-center items-center w-full mr-auto"},
-                    root:{className:"w-full flex flex-col items-center justify-start"},
-                    file:{className:"w-full flex justify-between"},
-                    actions:{className:"flex justify-end"},
-                    details:{className:"flex flex-col text-center w-full"},
-                    badge:{root:{className:" mr-4"}}
-                  }}
-                />
+              // rules={{ required: "priority is required." }}
+              render={({ field: { value, onChange, ...field } }) => (
+                <>
+                  <input
+                    {...field}
+                    value={value?.fileName}
+                    onChange={(event) => {
+                      onChange(event.target.files[0]);
+                    }}
+                    type="file"
+                    id="file"
+                  />
+                </>
+
+                // <FileUpload
+                //   id={field.name}
+                //   name="file"
+                //   url={"/api/upload"}
+                //   multiple
+                //   accept="image/*"
+                //   maxFileSize={1000000}
+                //   onChange={(e) => console.log(e)}
+                //   emptyTemplate={
+                //     <p className="m-0">
+                //       Drag and drop files to here to upload.
+                //     </p>
+                //   }
+                //   pt={{
+                //     buttonbar: {
+                //       className:
+                //         "w-full min-h-12 flex items-center space-x-4 mb-4",
+                //     },
+                //     chooseButton: { className: "px-4 py-2 ml-4" },
+                //     chooseButtonLabel: { className: "px-2" },
+                //     uploadButton: {
+                //       root: { className: "px-4 py-2 ml-4" },
+                //       label: { className: "px-2" },
+                //     },
+                //     cancelButton: {
+                //       root: { className: "px-4 py-2 ml-4" },
+                //       label: { className: "px-2" },
+                //     },
+                //     message: { root: { className: "px-4" } },
+                //     content: {
+                //       className:
+                //         "w-full p-4 felx justify-center items-center w-full mr-auto",
+                //     },
+                //     root: {
+                //       className:
+                //         "w-full flex flex-col items-center justify-start",
+                //     },
+                //     file: { className: "w-full flex justify-between" },
+                //     actions: { className: "flex justify-end" },
+                //     details: { className: "flex flex-col text-center w-full" },
+                //     badge: { root: { className: " mr-4" } },
+                //   }}
+                // />
               )}
             />
           </div>
