@@ -44,6 +44,7 @@ type ticketListQueue={
   TicketID:number;
   ArticleSenderType?:string[];
   AllArticles?:number;
+  Attachments:number;
 }
 
 

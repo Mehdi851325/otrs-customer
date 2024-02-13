@@ -55,7 +55,6 @@ const DetailTicket = () => {
   const [articles, setArticles] = useState([]);
   const { id } = useParams<Params>();
   const { register, control, handleSubmit } = useForm<FormData>();
-  console.log(id);
   useEffect(() => {
     const sessionID = localStorage.getItem("session");
     ticketList({
@@ -63,7 +62,9 @@ const DetailTicket = () => {
       TicketID: parseInt(id!),
       ArticleSenderType: ["customer", "agent"],
       AllArticles: 1,
+      Attachments:1,
     }).then((res: any) => {
+      console.log(res.data.data.Ticket)
       setArticles(res.data.data.Ticket[0].Article);
       setDetailTicket(res.data.data.Ticket[0]);
     });
@@ -167,6 +168,7 @@ const DetailTicket = () => {
                       </ul>
                     </div>
                     <div className="border-t-4 py-4 pr-6">{article.Body}</div>
+                    {article.Attachment && (<a href={article.Attachment[0].Content} download>{article.Attachment[0].Filename}</a>)}
                   </div>
                 </Card>
               </AccordionTab>

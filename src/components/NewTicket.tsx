@@ -15,6 +15,7 @@ import { Editor } from "primereact/editor";
 import "quill/dist/quill.snow.css";
 import Priority from "../data/Priority";
 import { FileUpload } from "primereact/fileupload";
+import ContentType from "../data/ContentType";
 
 interface FormData {
   description: string;
@@ -22,7 +23,7 @@ interface FormData {
   title: string;
   type: { name: string; code: string };
   priority: string;
-  file: string;
+  file: {type:string; name:string; }
 }
 // const renderHeader = () => {
 //   return (
@@ -40,10 +41,13 @@ const NewTicket = () => {
   const navigate = useNavigate();
   const [sessionGet] = useSessionGetMutation();
   const [ticketCreate] = useTicketCreateMutation();
-
+  
   const [emailUser, setEmailUser] = useState<string>();
 
   const { register, control, handleSubmit } = useForm<FormData>();
+
+  const contetType = ContentType.filter((type)=> console.log(type))
+console.log(contetType)
 
   useEffect(() => {
     const sessionID = localStorage.getItem("session");
@@ -67,37 +71,38 @@ const NewTicket = () => {
     var reader = new FileReader();
     reader.readAsDataURL(data.file);
     reader.onload = function () {
-      // ticketCreate({
-      //   SessionID: sessionID,
-      //   Ticket: {
-      //     Type: data.type.name,
-      //     Title: data.title,
-      //     Queue: queueFormat?.data,
-      //     Lock: "unlock",
-      //     CustomerUser: emailUser,
-      //     State: "new",
-      //     Priority: "3 عادی",
-      //     OwnerID: 1,
-      //   },
-      //   Article: {
-      //     ArticleTypeID: 1,
-      //     SenderTypeID: 1,
-      //     Subject: data.title,
-      //     Body: data.description,
-      //     ContentType: "text/plain; charset=utf8",
-      //     Charset: "utf8",
-      //     MimeType: "text/plain",
-      //     From: emailUser,
-      //     Attachment: {
-      //       Content: reader.result,
-      //       ContentType: data.file.type,
-      //       Filename: data.file.name,
-      //     },
-      //   },
-      // }).then((res) => {
-      //   navigate("/myticket");
-      //   console.log(res);
-      // });
+      ticketCreate({
+        SessionID: sessionID,
+        Ticket: {
+          Type: data.type.name,
+          Title: data.title,
+          Queue: queueFormat?.data,
+          Lock: "unlock",
+          CustomerUser: emailUser,
+          State: "new",
+          Priority: "3 عادی",
+          OwnerID: 1,
+        },
+        Article: {
+          ArticleTypeID: 1,
+          SenderTypeID: 1,
+          Subject: data.title,
+          Body: data.description,
+          ContentType: "text/plain; charset=utf8",
+          Charset: "utf8",
+          MimeType: "text/plain",
+          From: emailUser,
+
+        },
+        Attachment: {
+          Content: reader.result,
+          ContentType: data.file.type,
+          Filename: data.file.name,
+        },
+      }).then((res) => {
+        navigate("/myticket");
+        console.log(res);
+      }); 
       console.log(reader.result);
     };
   };
@@ -251,18 +256,37 @@ const NewTicket = () => {
               control={control}
               // rules={{ required: "priority is required." }}
               render={({ field: { value, onChange, ...field } }) => (
-                <>
-                  <input
-                    {...field}
-                    value={value?.fileName}
-                    onChange={(event) => {
-                      onChange(event.target.files[0]);
-                    }}
-                    type="file"
-                    id="file"
-                  />
-                </>
-
+                // <>
+                //   <input
+                //     {...field}
+                //     value={value?.fileName}
+                //     onChange={(event) => {
+                //       onChange(event.target.files[0]);
+                //     }}
+                //     type="file"
+                //     id="file"
+                //   />
+                // </>
+                <FileUpload
+                  mode="basic"
+                  name="demo[]"
+                  url="/api/upload"
+                  accept="image/*"
+                  customUpload
+                  uploadHandler={(e) => onChange(e.files[0])}
+                  pt={{
+                    
+                    chooseButton: { className: "w-[220px]" },
+                    root: {
+                      className:
+                        "w-full flex items-center justify-start",
+                    },
+                    label:{className:"m-2"},
+                    chooseIcon:{className:"mx-2"},
+                    buttonbar:{className:"m-4"},
+                    
+                  }}
+                />
                 // <FileUpload
                 //   id={field.name}
                 //   name="file"
@@ -270,7 +294,7 @@ const NewTicket = () => {
                 //   multiple
                 //   accept="image/*"
                 //   maxFileSize={1000000}
-                //   onChange={(e) => console.log(e)}
+                //   uploadHandler={customBase64Uploader}
                 //   emptyTemplate={
                 //     <p className="m-0">
                 //       Drag and drop files to here to upload.
