@@ -11,12 +11,13 @@ import QueuesSM from "../data/QueuesSM";
 import Priority from "../data/Priority";
 // import StateReply from "../data/StateReply";
 //styled
-
+import { RiAttachment2 } from "react-icons/ri";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { Card } from "primereact/card";
 import { Button, TextField } from "@radix-ui/themes";
 import { Dropdown } from "primereact/dropdown";
 import { Editor } from "primereact/editor";
+import { FileUpload } from "primereact/fileupload";
 
 interface FormData {
   description: string;
@@ -25,14 +26,21 @@ interface FormData {
   type: { name: string; code: string };
   priority: string;
   state: string;
+  file: Blob ;
 }
-type Aeticle = {
+type Article = {
   ArticleNumber: number;
   Subject: string;
   From: string;
   To: string;
   Body: string;
+  Attachment: [Attachment];
 };
+interface Attachment {
+  Content: string;
+  Filename: string;
+  ContentType: string;
+}
 
 type DetailTicketType = {
   TicketNumber: number;
@@ -62,9 +70,9 @@ const DetailTicket = () => {
       TicketID: parseInt(id!),
       ArticleSenderType: ["customer", "agent"],
       AllArticles: 1,
-      Attachments:1,
+      Attachments: 1,
     }).then((res: any) => {
-      console.log(res.data.data.Ticket)
+      console.log(res.data.data.Ticket);
       setArticles(res.data.data.Ticket[0].Article);
       setDetailTicket(res.data.data.Ticket[0]);
     });
@@ -72,6 +80,12 @@ const DetailTicket = () => {
   const formSubmitHandler = (data: FormData) => {
     const sessionID = localStorage.getItem("session");
     if (detailTicket) {
+      var reader = new FileReader();
+    reader.readAsDataURL(data.file);
+    reader.onload = function () {
+      const stringResult:string = reader.result
+      const searchBase64 = stringResult.search("base64");
+      const sliceBase64 = stringResult.slice(searchBase64 + 7);
       ticketUpdate({
         SessionID: sessionID,
         Ticket: {
@@ -87,16 +101,17 @@ const DetailTicket = () => {
           ContentType: "text/plain; charset=utf8",
           Charset: "utf8",
           MimeType: "text/plain",
-          Attachment: {
-            Content: "Dear customer,",
-            ContentType: "text/plain",
-            Filename: "a.txt",
-          },
+        },
+        Attachment: {
+          Content: sliceBase64,
+          ContentType: data.file.type,
+          Filename: data.file.name,
         },
       }).then((res) => {
         console.log(res);
         navigate("/myticket");
       });
+    }
     }
   };
   const queueName = () => {
@@ -108,13 +123,19 @@ const DetailTicket = () => {
     }
   };
 
+  const hrefImage = (base64:Attachment) => {
+    const base64Content = base64.Content;
+    // const sliceBase64 = base64.Content.slice(searchBase64 + 6);
+    return `data:${base64.ContentType};base64,` + base64Content;
+  };
+
   return (
     <>
       <Navbar />
       <div className="w-full flex justify-center">
         <div className="w-8/12 flex items-center justify-center">
           <Accordion pt={{ root: { className: "w-full font-shabnam" } }}>
-            {articles.map((article: Aeticle, index: number) => (
+            {articles.map((article: Article, index: number) => (
               <AccordionTab
                 pt={{
                   header: { className: " rounded-md border-2 my-4" },
@@ -168,7 +189,18 @@ const DetailTicket = () => {
                       </ul>
                     </div>
                     <div className="border-t-4 py-4 pr-6">{article.Body}</div>
-                    {article.Attachment && (<a href={article.Attachment[0].Content} download>{article.Attachment[0].Filename}</a>)}
+                    {article.Attachment && (
+                      <div className="border-t-4 py-4 pr-6 flex text-center items-center">
+                        <a
+                        className="flex items-center bg-slate-300 p-2 rounded-md text-black"
+                          href={hrefImage(article.Attachment[0]) as string}
+                          download={article.Attachment[0].Filename}
+                        >
+                          <RiAttachment2 size={18}/>
+                          {article.Attachment[0].Filename}
+                        </a>
+                      </div>
+                    )}
                   </div>
                 </Card>
               </AccordionTab>
@@ -224,18 +256,23 @@ const DetailTicket = () => {
               />
             </TextField.Root>
             <Controller
-            name="description"
-            control={control}
-            render={({ field }) => (
-              <Editor
-                id={field.name}
-                name="description"
-                value={field.value}
-                onTextChange={(e) => field.onChange(e.textValue)}
-                style={{ height: "320px" ,	 fontSize:"1.25rem", fontFamily:"shabnam",textAlign:"right"}}
-              />
-            )}
-          />
+              name="description"
+              control={control}
+              render={({ field }) => (
+                <Editor
+                  id={field.name}
+                  name="description"
+                  value={field.value}
+                  onTextChange={(e) => field.onChange(e.textValue)}
+                  style={{
+                    height: "320px",
+                    fontSize: "1.25rem",
+                    fontFamily: "shabnam",
+                    textAlign: "right",
+                  }}
+                />
+              )}
+            />
             <div className="border-2 p-1 rounded-md card flex font-shabnam">
               <Controller
                 name="priority"
@@ -267,37 +304,31 @@ const DetailTicket = () => {
                 )}
               />
             </div>
-            {/* <div className="border-2 p-1 rounded-md card flex font-shabnam">
-              <Controller
-                name="state"
-                control={control}
-                rules={{ required: "state is required." }}
-                render={({ field }) => (
-                  <Dropdown
-                    id={field.name}
-                    value={field.value}
-                    optionLabel="name"
-                    placeholder="Select a state"
-                    options={StateReply}
-                    focusInputRef={field.ref}
-                    onChange={(e) => field.onChange(e.value)}
-                    className="w-full"
-                    pt={{
-                      root: {
-                        className:
-                          "flex flex-row-reverse justify-between w-full content-between text-right shadow-none",
-                      },
-                      input: {
-                        className:
-                          "justify-self-end self-end ml-auto font-shabnam",
-                      },
-                      panel: { className: "mt-4 font-shabnam text-right" },
-                      item: { className: "p-2" },
-                    }}
-                  />
-                )}
-              />
-            </div> */}
+            <div className="w-full border-2 p-1 rounded-md card flex font-shabnam">
+            <Controller
+              name="file"
+              control={control}
+              render={({ field: { onChange } }) => (
+                <FileUpload
+                  mode="basic"
+                  name="demo[]"
+                  url="/api/upload"
+                  customUpload
+                  uploadHandler={(e) => onChange(e.files[0])}
+                  chooseLabel="انتخاب فایل"
+                  pt={{
+                    chooseButton: { className: "w-[220px]" },
+                    root: {
+                      className: "w-full flex items-center justify-start",
+                    },
+                    label: { className: "m-2" },
+                    chooseIcon: { className: "mx-2" },
+                    buttonbar: { className: "m-4" },
+                  }}
+                />
+              )}
+            />
+          </div>
             <Button className="bg-primary-500 cursor-pointer px-6 py-4">
               ثبت
             </Button>

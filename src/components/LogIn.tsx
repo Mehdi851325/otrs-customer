@@ -1,13 +1,15 @@
 import { useNavigate } from "react-router-dom";
-import { useSessionLoginMutation } from "../redux/features/api/apiSlice";
 import saman from "../assets/saman.png";
 import { FormEvent } from "react";
+import { useSessionLoginMutation } from "../redux/features/api/apiSlice";
+import PortApi from "../data/PortApi";
 
 // interface Data {
 
 const LogIn = () => {
   const navigate = useNavigate();
   const [sessionLogin, { error }] = useSessionLoginMutation();
+ 
   let result;
   if (error) {
     console.log(error);
@@ -21,17 +23,37 @@ const LogIn = () => {
       result = "ارتباط با سرور برقرار نمی باشد";
     }
   }
+  const port = PortApi.map((port)=>port.name)
+  console.log(port)
   const handleSubmitFormLogin = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const target = e.target as any;
 
-    sessionLogin({
-      UserLogin: target[0].value,
-      Password: target[1].value,
-    }).then((res: any) => {
-      localStorage.setItem("session", res.data.data.SessionID);
-      navigate("/dashboard");
-    });
+    PortApi.map((port)=>{
+      sessionLogin({
+        session: {
+          UserLogin: target[0].value,
+          Password: target[1].value,
+        },
+        port: port.name,
+      }).then((res: any) => {
+        console.log(res)
+        localStorage.setItem(`session${port.name}`, res.data.data.SessionID);
+        navigate("/dashboard");
+      });
+    })
+    // sessionLogin({
+    //   session: {
+    //     UserLogin: target[0].value,
+    //     Password: target[1].value,
+    //   },
+    //   port: "15000",
+    // }).then((res: any) => {
+    //   console.log(res)
+    //   localStorage.setItem("session", res.data.data.SessionID);
+    // });
+   
+    
   };
   return (
     <>

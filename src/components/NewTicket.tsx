@@ -15,39 +15,24 @@ import { Editor } from "primereact/editor";
 import "quill/dist/quill.snow.css";
 import Priority from "../data/Priority";
 import { FileUpload } from "primereact/fileupload";
-import ContentType from "../data/ContentType";
 
 interface FormData {
   description: string;
   queue: { name: string; code: string };
   title: string;
   type: { name: string; code: string };
-  priority: string;
-  file: {type:string; name:string; }
+  priority: { name: string, code:string };
+  file: Blob ;
 }
-// const renderHeader = () => {
-//   return (
-//       <span className="ql-formats">
-//           <button className="ql-bold" aria-label="Bold"></button>
-//           <button className="ql-italic" aria-label="Italic"></button>
-//           <button className="ql-underline" aria-label="Underline"></button>
-//           <button className="ql-text Alignment" aria-label="Text Alignment"></button>
-//       </span>
-//   );
-// };
 
-// const header = renderHeader();
+
 const NewTicket = () => {
   const navigate = useNavigate();
   const [sessionGet] = useSessionGetMutation();
   const [ticketCreate] = useTicketCreateMutation();
-  
   const [emailUser, setEmailUser] = useState<string>();
 
   const { register, control, handleSubmit } = useForm<FormData>();
-
-  const contetType = ContentType.filter((type)=> console.log(type))
-console.log(contetType)
 
   useEffect(() => {
     const sessionID = localStorage.getItem("session");
@@ -62,15 +47,18 @@ console.log(contetType)
     });
   }, []);
 
-  const formSubmitHandler = (data: FormData) => {
+  const formSubmitHandler = (data: FormData ) => {
     const sessionID = localStorage.getItem("session");
     const queueFormat = QueuesSM.find(
       (queue) => queue.name === data.queue.name
     );
-
+    console.log(data);
     var reader = new FileReader();
     reader.readAsDataURL(data.file);
     reader.onload = function () {
+      const stringResult:string = reader.result
+      const searchBase64 = stringResult.search("base64");
+      const sliceBase64 = stringResult.slice(searchBase64 + 7);
       ticketCreate({
         SessionID: sessionID,
         Ticket: {
@@ -80,7 +68,7 @@ console.log(contetType)
           Lock: "unlock",
           CustomerUser: emailUser,
           State: "new",
-          Priority: "3 عادی",
+          Priority: data.priority.name,
           OwnerID: 1,
         },
         Article: {
@@ -92,18 +80,18 @@ console.log(contetType)
           Charset: "utf8",
           MimeType: "text/plain",
           From: emailUser,
-
         },
         Attachment: {
-          Content: reader.result,
+          Content: sliceBase64,
           ContentType: data.file.type,
           Filename: data.file.name,
         },
       }).then((res) => {
         navigate("/myticket");
         console.log(res);
-      }); 
-      console.log(reader.result);
+      });
+      
+      console.log(sliceBase64);
     };
   };
 
@@ -254,82 +242,24 @@ console.log(contetType)
             <Controller
               name="file"
               control={control}
-              // rules={{ required: "priority is required." }}
-              render={({ field: { value, onChange, ...field } }) => (
-                // <>
-                //   <input
-                //     {...field}
-                //     value={value?.fileName}
-                //     onChange={(event) => {
-                //       onChange(event.target.files[0]);
-                //     }}
-                //     type="file"
-                //     id="file"
-                //   />
-                // </>
+              render={({ field: { onChange } }) => (
                 <FileUpload
                   mode="basic"
                   name="demo[]"
                   url="/api/upload"
-                  accept="image/*"
                   customUpload
                   uploadHandler={(e) => onChange(e.files[0])}
+                  chooseLabel="انتخاب فایل"
                   pt={{
-                    
                     chooseButton: { className: "w-[220px]" },
                     root: {
-                      className:
-                        "w-full flex items-center justify-start",
+                      className: "w-full flex items-center justify-start",
                     },
-                    label:{className:"m-2"},
-                    chooseIcon:{className:"mx-2"},
-                    buttonbar:{className:"m-4"},
-                    
+                    label: { className: "m-2" },
+                    chooseIcon: { className: "mx-2" },
+                    buttonbar: { className: "m-4" },
                   }}
                 />
-                // <FileUpload
-                //   id={field.name}
-                //   name="file"
-                //   url={"/api/upload"}
-                //   multiple
-                //   accept="image/*"
-                //   maxFileSize={1000000}
-                //   uploadHandler={customBase64Uploader}
-                //   emptyTemplate={
-                //     <p className="m-0">
-                //       Drag and drop files to here to upload.
-                //     </p>
-                //   }
-                //   pt={{
-                //     buttonbar: {
-                //       className:
-                //         "w-full min-h-12 flex items-center space-x-4 mb-4",
-                //     },
-                //     chooseButton: { className: "px-4 py-2 ml-4" },
-                //     chooseButtonLabel: { className: "px-2" },
-                //     uploadButton: {
-                //       root: { className: "px-4 py-2 ml-4" },
-                //       label: { className: "px-2" },
-                //     },
-                //     cancelButton: {
-                //       root: { className: "px-4 py-2 ml-4" },
-                //       label: { className: "px-2" },
-                //     },
-                //     message: { root: { className: "px-4" } },
-                //     content: {
-                //       className:
-                //         "w-full p-4 felx justify-center items-center w-full mr-auto",
-                //     },
-                //     root: {
-                //       className:
-                //         "w-full flex flex-col items-center justify-start",
-                //     },
-                //     file: { className: "w-full flex justify-between" },
-                //     actions: { className: "flex justify-end" },
-                //     details: { className: "flex flex-col text-center w-full" },
-                //     badge: { root: { className: " mr-4" } },
-                //   }}
-                // />
               )}
             />
           </div>

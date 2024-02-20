@@ -1,5 +1,5 @@
 import { useEffect, useState} from "react";
-import DropdownList from "./DropdownList";
+
 
 
 import ListTicket from "./ListTicket";
@@ -12,6 +12,7 @@ import {
 } from "../redux/features/api/apiSlice";
 import FieldMessageTicket from "./FieldMessageTicket";
 import { useNavigate } from "react-router-dom";
+
 
 
 type Tickets = {
@@ -31,7 +32,8 @@ const Dashboard = () => {
   const [sessionGet] = useSessionGetMutation();
 
   const [tickets, setTickets] = useState<Tickets[]>([]);
-  const [queue] = useState<string>("IT:");
+  const [queue] = useState<string>("IT");
+
 
   // useEffect(() => {
   //   const sessionID = localStorage.getItem("session");
@@ -57,15 +59,45 @@ const Dashboard = () => {
   //       navigate("/");
   //     });
   // }, []);
+  // useEffect(() => {
+  //   const sessionID = localStorage.getItem("session");
+  //   sessionGet({ SessionID: sessionID }).then((res: any) => {
+  //     res.data && res.data.data.SessionData.find(
+  //       (detailSession: { Key: string; Value: string }) => {
+  //         if (detailSession.Key === "UserLogin") {
+  //           ticketSearch({
+  //             SessionID: sessionID,
+  //             Queue: "IT",
+  //             Title: "",
+  //             CustomerUserLogin: detailSession.Value,
+  //             States: [
+  //               "new",
+  //               "open",
+  //               "pending reminder",
+  //               "pending auto close+",
+  //               "pending auto close-",
+  //             ],
+  //           }).then((res:any) => {
+  //             ticketList({
+  //               SessionID: sessionID,
+  //               TicketID: res.data.data.TicketID,
+  //             }).then((res: any) => {
+  //               setTickets(res.data.data.Ticket);
+  //             })
+  //           });
+  //         }
+  //       }
+  //     );
+  //   });
+  // }, []);
   useEffect(() => {
-    const sessionID = localStorage.getItem("session");
-    sessionGet({ SessionID: sessionID }).then((res: any) => {
-      res.error && navigate("/")
-      res.data.data.SessionData.find(
+    const sessionIDHR = localStorage.getItem("sessionHR");
+    sessionGet({ SessionID: sessionIDHR }).then((res: any) => {
+      res.data && res.data.data.SessionData.find(
         (detailSession: { Key: string; Value: string }) => {
           if (detailSession.Key === "UserLogin") {
             ticketSearch({
-              SessionID: sessionID,
+              SessionID: sessionIDHR,
               Queue: "IT",
               Title: "",
               CustomerUserLogin: detailSession.Value,
@@ -82,9 +114,7 @@ const Dashboard = () => {
                 TicketID: res.data.data.TicketID,
               }).then((res: any) => {
                 setTickets(res.data.data.Ticket);
-              }).catch((err)=>{
-                console.log(err)
-              });
+              })
             });
           }
         }
@@ -92,13 +122,11 @@ const Dashboard = () => {
     });
   }, []);
   
-  
   return (
     <>
       <Navbar />
       <div className="flex flex-col justify-center w-full items-center">
         <NewTicketBoxs />
-        <DropdownList />
         {tickets.length === 0 ? (
           <FieldMessageTicket />
         ) : (

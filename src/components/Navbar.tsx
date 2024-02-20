@@ -22,11 +22,10 @@ const Navbar = () => {
 
   const iconStyle = { color: "gray" };
   useEffect(() => {
-    const sessionID = localStorage.getItem("session");
-    
-    sessionGet({ SessionID: sessionID }).then((res: any) => {
-      res.error && navigate("/");
-      res.data.data.SessionData.find(
+    const sessionID = localStorage.getItem("session15000");
+    console.log(sessionID)
+    sessionGet({session :{SessionID: sessionID},port: "15000" }).then((res: any) => { 
+      res.data && res.data.data.SessionData.find(
         (detail: { Key: string; Value: string }) => {
           if (detail.Key === "UserFullname") {
             setUserInfo(detail.Value);
@@ -36,7 +35,7 @@ const Navbar = () => {
     });
   }, []);
   const LogOutHandler=()=>{
-    localStorage.removeItem("session")
+    localStorage.removeItem("session15000")
     navigate("/")
   }
   // const darkModeHandler = () => {
@@ -68,7 +67,7 @@ const Navbar = () => {
               className="min-w-[100px] bg-white rounded-md p-[5px]"
               sideOffset={5}
             >
-              <DropdownMenu.Item onClick={()=>LogOutHandler()} className="group text-[13px] cursor-pointer text-right bg-white leading-none rounded-[3px] flex items-center h-[25px] px-[5px] relative pl-[25px] select-none outline-none">
+              <DropdownMenu.Item onClick={()=>LogOutHandler()} className=" text-[15px] cursor-pointer text-right bg-white leading-none rounded-[3px] flex items-center h-[18px] px-[5px] relative pl-[25px] select-none outline-none">
                 <button className="bg-white text-black font-shabnam">خروج</button>
               </DropdownMenu.Item>
             </DropdownMenu.Content>

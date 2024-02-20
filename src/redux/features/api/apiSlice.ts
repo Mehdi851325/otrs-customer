@@ -6,12 +6,15 @@ interface DataSession {
 }
 interface Session{
   SessionID:string
-
 }
 interface IFormState{
-  UserLogin: string;
-  Password: string;
+  session: {
+    UserLogin:string;
+    Password:string;
+  };
+  port: string;
 }
+
 
 type ticketSearchType={
   data:{
@@ -36,8 +39,21 @@ type ticketListType={
       CustomerUserID: string;
       TicketID:number;
     }
-  }
-     
+    Article:Article
+  }    
+}
+type Article = {
+  ArticleNumber: number;
+  Subject: string;
+  From: string;
+  To: string;
+  Body: string;
+  Attachment: [Attachment];
+};
+interface Attachment {
+  Content: string;
+  Filename: string;
+  ContentType: string;
 }
 type ticketListQueue={
   SessionID: string| null;
@@ -50,28 +66,42 @@ type ticketListQueue={
 
 export const apiSlice = createApi({
   reducerPath: "api",
-  baseQuery: fetchBaseQuery({ baseUrl: "https://support-api.si24.ir:15000" }),
+  baseQuery: fetchBaseQuery({ baseUrl: "https://support-api.si24.ir" }),
   endpoints: (builder) => ({
     sessionLogin: builder.mutation<DataSession,IFormState>({
-      query: (session) => ({
-        url: "/Session",
-        method: "POST",
-        body: session,
-      }),
+      query: (sessionarg) => {
+        const {session ,port }=sessionarg
+        const baseUrl = port ? `https://support-api.si24.ir:${port}` : "https://support-api.si24.ir";
+        return{   
+            url: `${baseUrl}/Session`,
+            method: "POST",
+            body: session,
+            
+        }
+      },
     }),
     sessionGet: builder.mutation({
-      query:(sessionId) => ({
-        url: "/Session",
-        method: "PUT",
-        body: sessionId
-      })
+      query: (sessionArg) => {
+        const {session ,port } = sessionArg
+        const baseUrl = port ? `https://support-api.si24.ir:${port}` : "https://support-api.si24.ir";
+        return{   
+            url: `${baseUrl}/Session`,
+            method: "PUT",
+            body: session,
+            
+        }
+      },
     }),
     ticketSearch: builder.mutation<ticketSearchType,ticketSearchQueue>({
-      query:(Queue) =>({
-        url:"/TicketSearch",
-        method: "PUT",
-        body: Queue
-      })
+      query:(QueueArg) =>{
+        const {Queue ,port } = QueueArg
+        const baseUrl = port ? `https://support-api.si24.ir:${port}` : "https://support-api.si24.ir";
+        return{
+          url:`${baseUrl}/TicketSearch`,
+          method: "PUT",
+          body: Queue
+        }
+      }
     }),
     ticketList: builder.mutation<ticketListType,ticketListQueue>({
       query:(ticketId) =>({
@@ -94,6 +124,7 @@ export const apiSlice = createApi({
         body: detailTicket
       })
     }),
+    
   }),
 });
 
