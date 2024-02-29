@@ -9,6 +9,7 @@ import {
 } from "../redux/features/api/apiSlice";
 import ListTicket from "./ListTicket";
 import FieldMessageTicket from "./FieldMessageTicket";
+import PortApi from "../data/PortApi";
 
 type Tickets = {
   TicketNumber: number;
@@ -17,6 +18,7 @@ type Tickets = {
   CustomerUserID: string;
   StateType: string;
   TicketID?: number;
+  Type: string;
 };
 
 const SenderTicket = () => {
@@ -27,27 +29,42 @@ const SenderTicket = () => {
   const [ticketList, { isLoading }] = useTicketListMutation();
 
   useEffect(() => {
-    const sessionID = localStorage.getItem("session");
-    sessionGet({ SessionID: sessionID }).then((res: any) => {
-      res.data.data.SessionData.find(
-        (detailSession: { Key: string; Value: string }) => {
-          if (detailSession.Key === "UserLogin") {
-            ticketSearch({
-              SessionID: sessionID,
-              Queue: "IT",
-              Title: "",
-              CustomerUserLogin: detailSession.Value,
-            }).then((res: any) => {
-              ticketList({
-                SessionID: sessionID,
-                TicketID: res.data.data.TicketID,
+    PortApi.map((port) => {
+      sessionGet({
+        session: { SessionID: localStorage.getItem(`session${port.name}`) },
+        port: port.name,
+      }).then((res: any) => {
+        res.data.data.SessionData.find(
+          (detailSession: { Key: string; Value: string }) => {
+            if (detailSession.Key === "UserLogin") {
+              ticketSearch({
+                Queue: {
+                  SessionID: localStorage.getItem(`session${port.name}`),
+                  Title: "",
+                  CustomerUserLogin: detailSession.Value,
+                },
+                port: port.name,
               }).then((res: any) => {
-                setTickets(res.data.data.Ticket);
+                ticketList({
+                  ticketId: {
+                    SessionID: localStorage.getItem(`session${port.name}`),
+                    TicketID: res.data.data.TicketID,
+                    ArticleSenderType: ["customer", "agent"],
+                    AllArticles: 1,
+                    Attachments: 1,
+                  },
+                  port: port.name,
+                }).then((res: any) => {
+                  setTickets((tickets) => [
+                    ...tickets,
+                    ...res.data.data.Ticket,
+                  ]);
+                });
               });
-            });
+            }
           }
-        }
-      );
+        );
+      });
     });
   }, []);
 

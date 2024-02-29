@@ -1,12 +1,16 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Sidebar } from "primereact/sidebar";
 
 import { GiHamburgerMenu } from "react-icons/gi";
 import { Link } from "react-router-dom";
+import { StyleClass } from 'primereact/StyleClass';
+import { Ripple } from 'primereact/Ripple';
+import { TbWorldWww } from "react-icons/tb";
+import { FaUsers } from "react-icons/fa";
 
 export default function SideBarMenu() {
   const [visibleRight, setVisibleRight] = useState<boolean>(false);
-
+  const btnRef3 = useRef<any>(null);
   return (
     <>
       <div className="flex justify-content-center font-shabnam  bg-white dark:bg-gray-800">
@@ -82,7 +86,7 @@ export default function SideBarMenu() {
                       >
                         درخواست ها
                       </h5>
-                      <li className="text-right">
+                      {/* <li className="text-right">
                         <Link
                           to={"/newticket"}
                           className="flex items-center justify-end space-x-4 p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
@@ -99,6 +103,51 @@ export default function SideBarMenu() {
                             <path d="M18 10h-4v-4c0-1.104-.896-2-2-2s-2 .896-2 2l.071 4h-4.071c-1.104 0-2 .896-2 2s.896 2 2 2l4.071-.071-.071 4.071c0 1.104.896 2 2 2s2-.896 2-2v-4.071l4 .071c1.104 0 2-.896 2-2s-.896-2-2-2z" />
                           </svg>
                         </Link>
+                      </li> */}
+                      <li>
+                        <StyleClass
+                          nodeRef={btnRef3}
+                          selector="@next"
+                          enterClassName="hidden"
+                          enterActiveClassName="slidedown"
+                          leaveToClassName="hidden"
+                          leaveActiveClassName="slideup"
+                        >
+                          <a
+                            ref={btnRef3}
+                            className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 transition-duration-150 transition-colors w-full"
+                          >
+                            <i className="pi pi-chart-line mr-2"></i>
+                            <span className="font-medium">ایجاد درخواست جدید</span>
+                            <i className="pi pi-chevron-down ml-auto mr-1"></i>
+                            <svg
+                            fill="currentColor"
+                            className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                            viewBox="0 0 24 24"
+                            version="1.2"
+                            baseProfile="tiny"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path d="M18 10h-4v-4c0-1.104-.896-2-2-2s-2 .896-2 2l.071 4h-4.071c-1.104 0-2 .896-2 2s.896 2 2 2l4.071-.071-.071 4.071c0 1.104.896 2 2 2s2-.896 2-2v-4.071l4 .071c1.104 0 2-.896 2-2s-.896-2-2-2z" />
+                          </svg>
+                          </a>
+                        </StyleClass>
+                        <ul className="list-none py-0 text-right pl-3 pr-0 m-0 hidden overflow-y-hidden transition-all transition-duration-400 transition-ease-in-out">
+                          <li className="text-right">
+                            <Link to={"/newticket/IT"} className="p-ripple flex text-right align-items-center items-center cursor-pointer p-3 border-round text-700 hover:bg-gray-100 transition-duration-150 transition-colors w-full">
+                              <i className="pi pi-table mr-2"></i>
+                              <span className="font-medium text-right pr-2"> واحد فناوری اطلاعات</span>
+                              <TbWorldWww size={25} />
+                            </Link>
+                          </li>
+                          <li className="text-right">
+                            <Link to={"/newticket/HR"} className="p-ripple flex align-items-center cursor-pointer p-3 border-round text-700 hover:bg-gray-100 transition-duration-150 transition-colors w-full">
+                              <i className="pi pi-search mr-2"></i>
+                              <span className="font-medium pr-2 pl-4">واحد منابع انسانی</span>
+                              <FaUsers size={25} />
+                            </Link>
+                          </li>
+                        </ul>
                       </li>
                       <li className="text-right">
                         <Link

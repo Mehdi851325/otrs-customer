@@ -10,89 +10,147 @@ import TicketTypes from "../data/TicketTypes";
 import QueuesSM from "../data/QueuesSM";
 import { useSessionGetMutation } from "../redux/features/api/apiSlice";
 import { useTicketCreateMutation } from "../redux/features/api/apiSlice";
-import { useNavigate } from "react-router-dom";
+import {  useParams } from "react-router-dom";
 import { Editor } from "primereact/editor";
 import "quill/dist/quill.snow.css";
 import Priority from "../data/Priority";
 import { FileUpload } from "primereact/fileupload";
+
+import TicketTypeHR from "../data/TicketTypeHR";
 
 interface FormData {
   description: string;
   queue: { name: string; code: string };
   title: string;
   type: { name: string; code: string };
-  priority: { name: string, code:string };
-  file: Blob ;
+  priority: { name: string; code: string };
+  file: Blob;
 }
-
-
+type Params = {
+  id?: string;
+};
 const NewTicket = () => {
-  const navigate = useNavigate();
+ 
+  const { id } = useParams<Params>();
+
   const [sessionGet] = useSessionGetMutation();
   const [ticketCreate] = useTicketCreateMutation();
   const [emailUser, setEmailUser] = useState<string>();
-
+  const [fullNameUser,setFullNameUser] = useState<string>()
   const { register, control, handleSubmit } = useForm<FormData>();
 
+  // const paramsPort = PortApi.find((port) => port.code === id);
+  // console.log(paramsPort);
+
   useEffect(() => {
-    const sessionID = localStorage.getItem("session");
-    sessionGet({ SessionID: sessionID }).then((res: any) => {
+    // const sessionID = localStorage.getItem(`session${paramsPort?.name}`);
+
+    sessionGet({
+      session: {
+        SessionID: localStorage.getItem(
+          `session${id === "HR" ? "23000" : "15000"}`
+        ),
+      },
+      port: `${id === "HR" ? "23000" : "15000"}`,
+    }).then((res: any) => {
       res.data.data.SessionData.find(
         (detailSession: { Key: string; Value: string }) => {
           if (detailSession.Key === "UserEmail") {
             setEmailUser(detailSession.Value);
           }
+          if (detailSession.Key === "UserFullname") {
+            setFullNameUser(detailSession.Value)
+          }
         }
       );
     });
+    
   }, []);
+  console.log(fullNameUser)
+  const formSubmitHandler = (data: FormData) => {
+    // const sessionID = localStorage.getItem(`session${paramsPort?.name}`);
+    // const sessionIDHR = localStorage.getItem("session23000");
 
-  const formSubmitHandler = (data: FormData ) => {
-    const sessionID = localStorage.getItem("session");
     const queueFormat = QueuesSM.find(
       (queue) => queue.name === data.queue.name
     );
-    console.log(data);
-    var reader = new FileReader();
-    reader.readAsDataURL(data.file);
-    reader.onload = function () {
-      const stringResult:string = reader.result
-      const searchBase64 = stringResult.search("base64");
-      const sliceBase64 = stringResult.slice(searchBase64 + 7);
+    
+    if (data.file) {
+      var reader = new FileReader();
+      reader.readAsDataURL(data.file);
+      reader.onload = function () {
+        const stringResult: string = reader.result;
+        const searchBase64 = stringResult.search("base64");
+        const sliceBase64 = stringResult.slice(searchBase64 + 7);
+        ticketCreate({
+          ticketInfo: {
+            SessionID: localStorage.getItem(
+              `session${id === "HR" ? "23000" : "15000"}`
+            ),
+            Ticket: {
+              Type: data.type.name,
+              Title: data.title,
+              Queue: queueFormat.data,
+              Lock: "unlock",
+              CustomerUser: emailUser,
+              State: "new",
+              Priority: "3 عادی",
+              OwnerID: 1,
+            },
+            Article: {
+              ArticleTypeID: 1,
+              SenderTypeID: 1,
+              Subject: data.title,
+              Body: data.description,
+              ContentType: "text/plain; charset=utf8",
+              Charset: "utf8",
+              MimeType: "text/plain",
+            },
+            Attachment: {
+              Content: sliceBase64,
+              ContentType: data.file.type,
+              Filename: data.file.name,
+            },
+          },
+          port: `${id === "HR" ? "23000" : "15000"}`,
+        }).then((res) => {
+          // navigate("/myticket");
+          console.log(res);
+        });
+      };
+    } else {
       ticketCreate({
-        SessionID: sessionID,
-        Ticket: {
-          Type: data.type.name,
-          Title: data.title,
-          Queue: queueFormat?.data,
-          Lock: "unlock",
-          CustomerUser: emailUser,
-          State: "new",
-          Priority: data.priority.name,
-          OwnerID: 1,
+        ticketInfo: {
+          SessionID: localStorage.getItem(
+            `session${id === "HR" ? "23000" : "15000"}`
+          ),
+          Ticket: {
+            Type: data.type.name,
+            Title: data.title,
+            Queue: queueFormat.data,
+            Lock: "unlock",
+            CustomerUser: emailUser,
+            State: "new",
+            Priority: "3 عادی",
+            OwnerID: 1,
+          },
+          Article: {
+            ArticleTypeID: 1,
+            SenderTypeID: 1,
+            Subject: data.title,
+            Body: data.description,
+            ContentType: "text/plain; charset=utf8",
+            Charset: "utf8",
+            MimeType: "text/plain",
+            From: emailUser,
+          },
         },
-        Article: {
-          ArticleTypeID: 1,
-          SenderTypeID: 1,
-          Subject: data.title,
-          Body: data.description,
-          ContentType: "text/plain; charset=utf8",
-          Charset: "utf8",
-          MimeType: "text/plain",
-          From: emailUser,
-        },
-        Attachment: {
-          Content: sliceBase64,
-          ContentType: data.file.type,
-          Filename: data.file.name,
-        },
+        port: `${id === "HR" ? "23000" : "15000"}`,
       }).then((res) => {
-        navigate("/myticket");
+        // navigate("/myticket");
         console.log(res);
       });
-      
-      console.log(sliceBase64);
-    };
+    }
   };
 
   return (
@@ -114,7 +172,7 @@ const NewTicket = () => {
                   value={field.value}
                   optionLabel="name"
                   placeholder="انتخاب نوع درخواست"
-                  options={TicketTypes}
+                  options={id === "IT" ? TicketTypes : TicketTypeHR}
                   focusInputRef={field.ref}
                   onChange={(e) => field.onChange(e.value)}
                   className="w-full"
@@ -146,7 +204,12 @@ const NewTicket = () => {
                     value={field.value}
                     optionLabel="name"
                     placeholder="انتخاب واحد"
-                    options={[{ name: "Helpdesk", code: "01" }]}
+                    options={[
+                      {
+                        name: `${id === "HR" ? "درخواست جذب" : "Helpdesk"}`,
+                        code: "01",
+                      },
+                    ]}
                     focusInputRef={field.ref}
                     onChange={(e) => field.onChange(e.value)}
                     className="w-full"

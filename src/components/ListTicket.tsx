@@ -20,6 +20,7 @@ type Tickets = {
   CustomerUserID: string;
   StateType: string;
   TicketID?: number;
+  Type: string;
 };
 
 type Props = {
@@ -28,10 +29,11 @@ type Props = {
   isLoading: boolean;
 };
 
-const ListTicket = ({ tickets, queue, isLoading }: Props) => {
+const ListTicket = ({ tickets, isLoading }: Props) => {
   const navigate = useNavigate();
   delay(2000);
   console.log(tickets);
+  
   if (isLoading) {
     return <LoadingListTicket />;
   }
@@ -55,7 +57,7 @@ const ListTicket = ({ tickets, queue, isLoading }: Props) => {
               <Table.Row
                 key={ticket.TicketNumber}
                 className="text-right hover:bg-gray-100 cursor-pointer"
-                onClick={() => navigate(`/ticket/${ticket.TicketID}`)}
+                onClick={() => navigate(`/ticket/${ticket.Type === "درخواست جذب"?"HR":"IT"}/${ticket.TicketID}`)}
               >
                 <Table.Cell>
                   <Badge color={statusMap[ticket.StateType].color}>
@@ -67,8 +69,8 @@ const ListTicket = ({ tickets, queue, isLoading }: Props) => {
                 <Table.Cell>{ticket.CustomerUserID}</Table.Cell>
                 <Table.Cell>{ticket.TicketNumber}</Table.Cell>
                 <Table.Cell>
-                  <button className="bg-secondary-IT py-1 px-3 rounded-md">
-                    {queue}
+                  <button className={`py-1 px-3 rounded-md text-center items-center w-12 ${ticket.Type === "درخواست جذب"? "bg-secondary-HR":"bg-secondary-IT"}`}>
+                    {ticket.Type === "درخواست جذب" ? "HR" : "IT"}
                   </button>
                 </Table.Cell>
               </Table.Row>

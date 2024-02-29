@@ -19,6 +19,7 @@ import { Dropdown } from "primereact/dropdown";
 import { Editor } from "primereact/editor";
 import { FileUpload } from "primereact/fileupload";
 
+
 interface FormData {
   description: string;
   queue: string;
@@ -26,7 +27,7 @@ interface FormData {
   type: { name: string; code: string };
   priority: string;
   state: string;
-  file: Blob ;
+  file: Blob;
 }
 type Article = {
   ArticleNumber: number;
@@ -52,6 +53,7 @@ type DetailTicketType = {
 };
 type Params = {
   id?: string;
+  unit:string;
 };
 const DetailTicket = () => {
   const navigate = useNavigate();
@@ -61,57 +63,65 @@ const DetailTicket = () => {
   const [detailTicket, setDetailTicket] = useState<DetailTicketType>();
   const [showReply, setShowReply] = useState(false);
   const [articles, setArticles] = useState([]);
-  const { id } = useParams<Params>();
+  const {unit, id} = useParams<Params>();
+  
   const { register, control, handleSubmit } = useForm<FormData>();
   useEffect(() => {
-    const sessionID = localStorage.getItem("session");
-    ticketList({
-      SessionID: sessionID,
-      TicketID: parseInt(id!),
-      ArticleSenderType: ["customer", "agent"],
-      AllArticles: 1,
-      Attachments: 1,
-    }).then((res: any) => {
-      console.log(res.data.data.Ticket);
-      setArticles(res.data.data.Ticket[0].Article);
-      setDetailTicket(res.data.data.Ticket[0]);
-    });
+
+      ticketList({
+        ticketId: {
+          SessionID: localStorage.getItem(`session${unit === "HR"?"23000":"15000"}`),
+          TicketID: parseInt(id!),
+          ArticleSenderType: ["customer", "agent"],
+          AllArticles: 1,
+          Attachments: 1,
+        },
+        port: `${unit === "HR"?"23000":"15000"}`,
+      }).then((res: any) => {
+        console.log(res);
+        setArticles(res.data.data.Ticket[0].Article);
+        setDetailTicket(res.data.data.Ticket[0]);
+      });
   }, []);
+
   const formSubmitHandler = (data: FormData) => {
-    const sessionID = localStorage.getItem("session");
+    
     if (detailTicket) {
       var reader = new FileReader();
-    reader.readAsDataURL(data.file);
-    reader.onload = function () {
-      const stringResult:string = reader.result
-      const searchBase64 = stringResult.search("base64");
-      const sliceBase64 = stringResult.slice(searchBase64 + 7);
-      ticketUpdate({
-        SessionID: sessionID,
-        Ticket: {
-          TicketID: parseInt(id!),
-          Queue: "",
-          State: "open",
-          Owner: detailTicket.Owner,
-        },
-        Article: {
-          CommunicationChannelID: 3,
-          Subject: data.title,
-          Body: data.description,
-          ContentType: "text/plain; charset=utf8",
-          Charset: "utf8",
-          MimeType: "text/plain",
-        },
-        Attachment: {
-          Content: sliceBase64,
-          ContentType: data.file.type,
-          Filename: data.file.name,
-        },
-      }).then((res) => {
-        console.log(res);
-        navigate("/myticket");
-      });
-    }
+      reader.readAsDataURL(data.file);
+      reader.onload = function () {
+        const stringResult: string = reader.result;
+        const searchBase64 = stringResult.search("base64");
+        const sliceBase64 = stringResult.slice(searchBase64 + 7);
+        ticketUpdate({
+          detailTicket: {
+            SessionID: localStorage.getItem(`session${unit === "HR"?"23000":"15000"}`),
+            Ticket: {
+              TicketID: parseInt(id!),
+              Queue: "",
+              State: "open",
+              Owner: detailTicket.Owner,
+            },
+            Article: {
+              CommunicationChannelID: 3,
+              Subject: data.title,
+              Body: data.description,
+              ContentType: "text/plain; charset=utf8",
+              Charset: "utf8",
+              MimeType: "text/plain",
+            },
+            Attachment: {
+              Content: sliceBase64,
+              ContentType: data.file.type,
+              Filename: data.file.name,
+            },
+          },
+          port: `${unit === "HR"?"23000":"15000"}`,
+        }).then((res) => {
+          console.log(res);
+          navigate("/myticket");
+        });
+      };
     }
   };
   const queueName = () => {
@@ -123,7 +133,7 @@ const DetailTicket = () => {
     }
   };
 
-  const hrefImage = (base64:Attachment) => {
+  const hrefImage = (base64: Attachment) => {
     const base64Content = base64.Content;
     // const sliceBase64 = base64.Content.slice(searchBase64 + 6);
     return `data:${base64.ContentType};base64,` + base64Content;
@@ -192,11 +202,11 @@ const DetailTicket = () => {
                     {article.Attachment && (
                       <div className="border-t-4 py-4 pr-6 flex text-center items-center">
                         <a
-                        className="flex items-center bg-slate-300 p-2 rounded-md text-black"
+                          className="flex items-center bg-slate-300 p-2 rounded-md text-black"
                           href={hrefImage(article.Attachment[0]) as string}
                           download={article.Attachment[0].Filename}
                         >
-                          <RiAttachment2 size={18}/>
+                          <RiAttachment2 size={18} />
                           {article.Attachment[0].Filename}
                         </a>
                       </div>
@@ -305,30 +315,30 @@ const DetailTicket = () => {
               />
             </div>
             <div className="w-full border-2 p-1 rounded-md card flex font-shabnam">
-            <Controller
-              name="file"
-              control={control}
-              render={({ field: { onChange } }) => (
-                <FileUpload
-                  mode="basic"
-                  name="demo[]"
-                  url="/api/upload"
-                  customUpload
-                  uploadHandler={(e) => onChange(e.files[0])}
-                  chooseLabel="انتخاب فایل"
-                  pt={{
-                    chooseButton: { className: "w-[220px]" },
-                    root: {
-                      className: "w-full flex items-center justify-start",
-                    },
-                    label: { className: "m-2" },
-                    chooseIcon: { className: "mx-2" },
-                    buttonbar: { className: "m-4" },
-                  }}
-                />
-              )}
-            />
-          </div>
+              <Controller
+                name="file"
+                control={control}
+                render={({ field: { onChange } }) => (
+                  <FileUpload
+                    mode="basic"
+                    name="demo[]"
+                    url="/api/upload"
+                    customUpload
+                    uploadHandler={(e) => onChange(e.files[0])}
+                    chooseLabel="انتخاب فایل"
+                    pt={{
+                      chooseButton: { className: "w-[220px]" },
+                      root: {
+                        className: "w-full flex items-center justify-start",
+                      },
+                      label: { className: "m-2" },
+                      chooseIcon: { className: "mx-2" },
+                      buttonbar: { className: "m-4" },
+                    }}
+                  />
+                )}
+              />
+            </div>
             <Button className="bg-primary-500 cursor-pointer px-6 py-4">
               ثبت
             </Button>

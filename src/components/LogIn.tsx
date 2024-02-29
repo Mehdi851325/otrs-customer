@@ -23,8 +23,7 @@ const LogIn = () => {
       result = "ارتباط با سرور برقرار نمی باشد";
     }
   }
-  const port = PortApi.map((port)=>port.name)
-  console.log(port)
+  
   const handleSubmitFormLogin = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const target = e.target as any;

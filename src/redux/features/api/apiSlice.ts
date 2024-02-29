@@ -23,11 +23,13 @@ type ticketSearchType={
      
 }
 type ticketSearchQueue={
-  SessionID: string| null,
-  Queue: string,
-  Title: string
-  CustomerUserLogin?:string
-  States?:string[]
+  Queue:{
+    SessionID: string| null,
+    Title: string;
+    CustomerUserLogin?:string;
+    States?:string[];
+  }
+  port:string
 }
 
 type ticketListType={
@@ -56,17 +58,20 @@ interface Attachment {
   ContentType: string;
 }
 type ticketListQueue={
-  SessionID: string| null;
-  TicketID:number;
-  ArticleSenderType?:string[];
-  AllArticles?:number;
-  Attachments:number;
+  ticketId:{
+    SessionID: string| null;
+    TicketID:number;
+    ArticleSenderType: string[] | null;
+    AllArticles: number | null;
+    Attachments: number | null;
+  }
+  port:string
 }
 
 
 export const apiSlice = createApi({
   reducerPath: "api",
-  baseQuery: fetchBaseQuery({ baseUrl: "https://support-api.si24.ir" }),
+  baseQuery: fetchBaseQuery({ baseUrl: "https://support-api.si24.ir:15000" }),
   endpoints: (builder) => ({
     sessionLogin: builder.mutation<DataSession,IFormState>({
       query: (sessionarg) => {
@@ -104,25 +109,38 @@ export const apiSlice = createApi({
       }
     }),
     ticketList: builder.mutation<ticketListType,ticketListQueue>({
-      query:(ticketId) =>({
-        url:"/TicketList",
-        method: "PUT",
-        body: ticketId
-      })
+      query:(ticketIdArg) =>{
+        const {ticketId,port} = ticketIdArg
+        const baseUrl = port ? `https://support-api.si24.ir:${port}` : "https://support-api.si24.ir";
+        return{
+          url:`${baseUrl}/TicketList`,
+          method: "PUT",
+          body: ticketId
+        }
+      }
     }),
     ticketCreate: builder.mutation({
-      query:(ticketInfo)=>({
-        url:"/Ticket",
-        method:"POST",
-        body:ticketInfo
-      })
+      query:(ticketInfoArg)=>{
+        const {ticketInfo,port} = ticketInfoArg
+        const baseUrl = port ? `https://support-api.si24.ir:${port}` : "https://support-api.si24.ir";
+        return{
+          url:`${baseUrl}/Ticket`,
+          method:"POST",
+          body:ticketInfo
+        }
+      }
+
     }),
     ticketUpdate: builder.mutation({
-      query:(detailTicket) =>({
-        url:"/Ticket",
-        method: "PATCH",
-        body: detailTicket
-      })
+      query:(detailTicketArg) =>{
+        const {detailTicket,port} = detailTicketArg
+        const baseUrl = port ? `https://support-api.si24.ir:${port}` : "https://support-api.si24.ir";
+        return{
+          url:`${baseUrl}/Ticket`,
+          method: "PATCH",
+          body: detailTicket
+        }
+      }
     }),
     
   }),

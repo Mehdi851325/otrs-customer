@@ -23,8 +23,7 @@ const Navbar = () => {
   const iconStyle = { color: "gray" };
   useEffect(() => {
     const sessionID = localStorage.getItem("session15000");
-    console.log(sessionID)
-    sessionGet({session :{SessionID: sessionID},port: "15000" }).then((res: any) => { 
+    sessionGet({session :{SessionID: sessionID},port: "15000" }).then((res: any) => {
       res.data && res.data.data.SessionData.find(
         (detail: { Key: string; Value: string }) => {
           if (detail.Key === "UserFullname") {
@@ -41,6 +40,7 @@ const Navbar = () => {
   // const darkModeHandler = () => {
   //   setTheme(theme === "dark" ? "light" : "dark");
   // };
+  
   return (
     <div className="flex justify-between min-h-20 px-6 items-center font-shabnam">
       <div>

@@ -14,7 +14,13 @@ import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <Theme accentColor="crimson" grayColor="sand" radius="large" scaling="95%" appearance="dark">
+    <Theme
+      accentColor="crimson"
+      grayColor="sand"
+      radius="large"
+      scaling="95%"
+      appearance="dark"
+    >
       <BrowserRouter>
         <Provider store={store}>
           <App />

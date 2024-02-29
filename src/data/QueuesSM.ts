@@ -20,4 +20,8 @@ export default [
     {key:"0-3",data:"IT::Analysis",name:"Analysis"},
     {key:"0-3-0",data:"IT::Analysis::DOCandPMO",name:"DOCandPMO"},
     {key:"0-3-1",data:"IT::Analysis::PO",name:"PO"},
+    {key:"1",data:"HR",name:"HR"},
+    {key:"1-0",data:"HR::training",name:"training"},
+    {key:"1-1",data:"HR::pension",name:"pension"},
+    {key:"1-2",data:"HR::employment",name:"employment"},
 ]

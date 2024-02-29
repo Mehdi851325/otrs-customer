@@ -11,25 +11,25 @@ const NewTicketBoxs = () => {
     {
       lable: "IT",
       name: "فناوری اطلاعات",
-      href: "/newticket",
+      href: "/newticket/IT",
       logo: <TbWorldWww size={35} />,
     },
     {
       lable: "Finance",
       name: "واحد مالی",
-      href: "/newticket",
+      href: "/newticket/Finance",
       logo: <FaMoneyCheck size={35} />,
     },
     {
       lable: "HR",
       name: "منابع انسانی",
-      href: "/newticket",
+      href: "/newticket/HR",
       logo: <FaUsers size={35} />,
     },
     {
       lable: "Darmanet",
       name: "درمانت",
-      href: "/newticket",
+      href: "/newticket/Darmanet",
       logo: <FaStethoscope size={35} />,
     },
   ];

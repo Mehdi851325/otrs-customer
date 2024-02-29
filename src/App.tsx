@@ -24,9 +24,9 @@ function App() {
         <Routes>
           <Route path="/" element={<LogIn />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/newticket" element={<NewTicket />} />
+          <Route path="/newticket/:id" element={<NewTicket />} />
           <Route path="/myticket" element={<SenderTicket />} />
-          <Route path="/ticket/:id" element={<DetailTicket />} />
+          <Route path="/ticket/:unit/:id" element={<DetailTicket />} />
         </Routes>
       </PrimeReactProvider>
       </div>
