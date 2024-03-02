@@ -1,5 +1,5 @@
 import { Badge, Table } from "@radix-ui/themes";
-import delay from "delay";
+
 import LoadingListTicket from "./LoadingListTicket";
 import { useNavigate } from "react-router-dom";
 
@@ -21,6 +21,7 @@ type Tickets = {
   StateType: string;
   TicketID?: number;
   Type: string;
+  Queue: string;
 };
 
 type Props = {
@@ -31,9 +32,13 @@ type Props = {
 
 const ListTicket = ({ tickets, isLoading }: Props) => {
   const navigate = useNavigate();
-  delay(2000);
+  const queueChange = (queue: string) => {
+    const sliceQueue = queue.slice(0, 2);
+    return sliceQueue;
+  };
+
   console.log(tickets);
-  
+
   if (isLoading) {
     return <LoadingListTicket />;
   }
@@ -57,7 +62,13 @@ const ListTicket = ({ tickets, isLoading }: Props) => {
               <Table.Row
                 key={ticket.TicketNumber}
                 className="text-right hover:bg-gray-100 cursor-pointer"
-                onClick={() => navigate(`/ticket/${ticket.Type === "درخواست جذب"?"HR":"IT"}/${ticket.TicketID}`)}
+                onClick={() =>
+                  navigate(
+                    `/ticket/${
+                      queueChange(ticket.Queue) === "HR" ? "HR" : "IT"
+                    }/${ticket.TicketID}`
+                  )
+                }
               >
                 <Table.Cell>
                   <Badge color={statusMap[ticket.StateType].color}>
@@ -69,8 +80,14 @@ const ListTicket = ({ tickets, isLoading }: Props) => {
                 <Table.Cell>{ticket.CustomerUserID}</Table.Cell>
                 <Table.Cell>{ticket.TicketNumber}</Table.Cell>
                 <Table.Cell>
-                  <button className={`py-1 px-3 rounded-md text-center items-center w-12 ${ticket.Type === "درخواست جذب"? "bg-secondary-HR":"bg-secondary-IT"}`}>
-                    {ticket.Type === "درخواست جذب" ? "HR" : "IT"}
+                  <button
+                    className={`py-1 px-3 rounded-md text-center items-center w-12 ${
+                      queueChange(ticket.Queue) === "HR"
+                        ? "bg-secondary-HR"
+                        : "bg-secondary-IT"
+                    }`}
+                  >
+                    {queueChange(ticket.Queue)}
                   </button>
                 </Table.Cell>
               </Table.Row>

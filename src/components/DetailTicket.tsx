@@ -27,7 +27,7 @@ interface FormData {
   type: { name: string; code: string };
   priority: string;
   state: string;
-  file: Blob;
+  file: any;
 }
 type Article = {
   ArticleNumber: number;
@@ -90,7 +90,7 @@ const DetailTicket = () => {
       var reader = new FileReader();
       reader.readAsDataURL(data.file);
       reader.onload = function () {
-        const stringResult: string = reader.result;
+        const stringResult: any = reader.result;
         const searchBase64 = stringResult.search("base64");
         const sliceBase64 = stringResult.slice(searchBase64 + 7);
         ticketUpdate({

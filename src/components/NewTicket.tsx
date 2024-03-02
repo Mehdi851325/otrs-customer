@@ -10,7 +10,7 @@ import TicketTypes from "../data/TicketTypes";
 import QueuesSM from "../data/QueuesSM";
 import { useSessionGetMutation } from "../redux/features/api/apiSlice";
 import { useTicketCreateMutation } from "../redux/features/api/apiSlice";
-import {  useParams } from "react-router-dom";
+import {  useNavigate, useParams } from "react-router-dom";
 import { Editor } from "primereact/editor";
 import "quill/dist/quill.snow.css";
 import Priority from "../data/Priority";
@@ -24,7 +24,7 @@ interface FormData {
   title: string;
   type: { name: string; code: string };
   priority: { name: string; code: string };
-  file: Blob;
+  file: any;
 }
 type Params = {
   id?: string;
@@ -32,7 +32,7 @@ type Params = {
 const NewTicket = () => {
  
   const { id } = useParams<Params>();
-
+  const navigate = useNavigate()
   const [sessionGet] = useSessionGetMutation();
   const [ticketCreate] = useTicketCreateMutation();
   const [emailUser, setEmailUser] = useState<string>();
@@ -72,14 +72,14 @@ const NewTicket = () => {
     // const sessionIDHR = localStorage.getItem("session23000");
 
     const queueFormat = QueuesSM.find(
-      (queue) => queue.name === data.queue.name
+      (queue) => queue.type === data.type.name
     );
-    
+    console.log(data)
     if (data.file) {
       var reader = new FileReader();
       reader.readAsDataURL(data.file);
       reader.onload = function () {
-        const stringResult: string = reader.result;
+        const stringResult: any = reader.result;
         const searchBase64 = stringResult.search("base64");
         const sliceBase64 = stringResult.slice(searchBase64 + 7);
         ticketCreate({
@@ -90,7 +90,7 @@ const NewTicket = () => {
             Ticket: {
               Type: data.type.name,
               Title: data.title,
-              Queue: queueFormat.data,
+              Queue: `${id === "IT"?"IT::Opration::Support::Helpdesk": queueFormat?.data}`,
               Lock: "unlock",
               CustomerUser: emailUser,
               State: "new",
@@ -114,7 +114,7 @@ const NewTicket = () => {
           },
           port: `${id === "HR" ? "23000" : "15000"}`,
         }).then((res) => {
-          // navigate("/myticket");
+          navigate("/myticket");
           console.log(res);
         });
       };
@@ -127,7 +127,7 @@ const NewTicket = () => {
           Ticket: {
             Type: data.type.name,
             Title: data.title,
-            Queue: queueFormat.data,
+            Queue: `${id === "IT"?"IT::Opration::Support::Helpdesk": queueFormat?.data}`,
             Lock: "unlock",
             CustomerUser: emailUser,
             State: "new",
@@ -147,7 +147,7 @@ const NewTicket = () => {
         },
         port: `${id === "HR" ? "23000" : "15000"}`,
       }).then((res) => {
-        // navigate("/myticket");
+        navigate("/myticket");
         console.log(res);
       });
     }
@@ -192,7 +192,7 @@ const NewTicket = () => {
               )}
             />
           </div>
-          <div className="border-2 p-1 rounded-md card flex justify-content-center">
+          {/* <div className="border-2 p-1 rounded-md card flex justify-content-center">
             <Controller
               name="queue"
               control={control}
@@ -226,7 +226,7 @@ const NewTicket = () => {
                       item: { className: "p-2" },
                     }}
                   />
-                  {/* <TreeSelect
+                  <TreeSelect
                     id={field.name}
                     value={field.value}
                     onChange={field.onChange}
@@ -240,11 +240,11 @@ const NewTicket = () => {
                       },
                       panel: { className: "mt-4 font-shabnam " },
                     }}
-                  ></TreeSelect> */}
+                  ></TreeSelect>
                 </>
               )}
             />
-          </div>
+          </div> */}
           <TextField.Root>
             <TextField.Input
               className="p-2 py-4 text-right"

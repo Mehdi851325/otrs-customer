@@ -20,6 +20,7 @@ type Tickets = {
   StateType: string;
   TicketID: number;
   Type: string;
+  Queue:string;
 };
 
 const Dashboard = () => {
