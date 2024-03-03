@@ -9,10 +9,9 @@ import PortApi from "../data/PortApi";
 const LogIn = () => {
   const navigate = useNavigate();
   const [sessionLogin, { error }] = useSessionLoginMutation();
- 
+
   let result;
   if (error) {
-    console.log(error);
     //@ts-ignore
     if (error.originalStatus === 500) {
       result = "khataye server";
@@ -23,12 +22,12 @@ const LogIn = () => {
       result = "ارتباط با سرور برقرار نمی باشد";
     }
   }
-  
+
   const handleSubmitFormLogin = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const target = e.target as any;
 
-    PortApi.map((port)=>{
+    PortApi.map((port) => {
       sessionLogin({
         session: {
           UserLogin: target[0].value,
@@ -36,11 +35,10 @@ const LogIn = () => {
         },
         port: port.name,
       }).then((res: any) => {
-        console.log(res)
         localStorage.setItem(`session${port.name}`, res.data.data.SessionID);
         navigate("/dashboard");
       });
-    })
+    });
     // sessionLogin({
     //   session: {
     //     UserLogin: target[0].value,
@@ -51,8 +49,6 @@ const LogIn = () => {
     //   console.log(res)
     //   localStorage.setItem("session", res.data.data.SessionID);
     // });
-   
-    
   };
   return (
     <>

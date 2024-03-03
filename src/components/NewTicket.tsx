@@ -18,6 +18,7 @@ import { FileUpload } from "primereact/fileupload";
 
 import TicketTypeHR from "../data/TicketTypeHR";
 
+
 interface FormData {
   description: string;
   queue: { name: string; code: string };
@@ -30,7 +31,7 @@ type Params = {
   id?: string;
 };
 const NewTicket = () => {
- 
+  
   const { id } = useParams<Params>();
   const navigate = useNavigate()
   const [sessionGet] = useSessionGetMutation();
@@ -64,8 +65,9 @@ const NewTicket = () => {
         }
       );
     });
+
     
-  }, []);
+  }, [id]);
   console.log(fullNameUser)
   const formSubmitHandler = (data: FormData) => {
     // const sessionID = localStorage.getItem(`session${paramsPort?.name}`);

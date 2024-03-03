@@ -32,12 +32,13 @@ type Props = {
 
 const ListTicket = ({ tickets, isLoading }: Props) => {
   const navigate = useNavigate();
+  // const [QueueName, setQueueName] = useState()
   const queueChange = (queue: string) => {
+    console.log(queue)
     const sliceQueue = queue.slice(0, 2);
     return sliceQueue;
   };
 
-  console.log(tickets);
 
   if (isLoading) {
     return <LoadingListTicket />;

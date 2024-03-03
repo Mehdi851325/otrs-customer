@@ -86,7 +86,7 @@ const DetailTicket = () => {
 
   const formSubmitHandler = (data: FormData) => {
     
-    if (detailTicket) {
+    if (data.file) {
       var reader = new FileReader();
       reader.readAsDataURL(data.file);
       reader.onload = function () {
@@ -100,7 +100,7 @@ const DetailTicket = () => {
               TicketID: parseInt(id!),
               Queue: "",
               State: "open",
-              Owner: detailTicket.Owner,
+              Owner: detailTicket?.Owner,
             },
             Article: {
               CommunicationChannelID: 3,
@@ -122,6 +122,30 @@ const DetailTicket = () => {
           navigate("/myticket");
         });
       };
+    } else{
+      ticketUpdate({
+        detailTicket: {
+          SessionID: localStorage.getItem(`session${unit === "HR"?"23000":"15000"}`),
+          Ticket: {
+            TicketID: parseInt(id!),
+            Queue: "",
+            State: "open",
+            Owner: detailTicket?.Owner,
+          },
+          Article: {
+            CommunicationChannelID: 3,
+            Subject: data.title,
+            Body: data.description,
+            ContentType: "text/plain; charset=utf8",
+            Charset: "utf8",
+            MimeType: "text/plain",
+          },
+        },
+        port: `${unit === "HR"?"23000":"15000"}`,
+      }).then((res) => {
+        console.log(res);
+        navigate("/myticket");
+      });
     }
   };
   const queueName = () => {

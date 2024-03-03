@@ -6,7 +6,7 @@ import { FaMoneyCheck } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const NewTicketBoxs = () => {
-  const navigate =useNavigate()
+  const navigate = useNavigate();
   const boxes = [
     {
       lable: "IT",
@@ -15,16 +15,16 @@ const NewTicketBoxs = () => {
       logo: <TbWorldWww size={35} />,
     },
     {
-      lable: "Finance",
-      name: "واحد مالی",
-      href: "/newticket/Finance",
-      logo: <FaMoneyCheck size={35} />,
-    },
-    {
       lable: "HR",
       name: "منابع انسانی",
       href: "/newticket/HR",
       logo: <FaUsers size={35} />,
+    },
+    {
+      lable: "Finance",
+      name: "واحد مالی",
+      href: "/newticket/Finance",
+      logo: <FaMoneyCheck size={35} />,
     },
     {
       lable: "Darmanet",
@@ -39,12 +39,12 @@ const NewTicketBoxs = () => {
       {boxes.map((box) => (
         <div
           key={box.href}
-          onClick={()=>navigate(box.href)}
+          onClick={() => navigate(box.href)}
           className={classNames({
-            "bg-secondary-IT": box.lable === "IT",
-            "bg-secondary-Finance": box.lable === "Finance",
-            "bg-secondary-HR": box.lable === "HR",
-            "bg-secondary-Darmanet": box.lable === "Darmanet",
+            "bg-secondary-IT pointer-events-auto ": box.lable === "IT",
+            "bg-gray-400 pointer-events-none ":
+              box.lable === "Finance" || "Darmanet",
+            "bg-secondary-HR pointer-events-auto ": box.lable === "HR",
             "pr-2 cursor-pointer w-1/5 py-8  flex flex-col m-auto border-2 rounded-2xl":
               true,
           })}

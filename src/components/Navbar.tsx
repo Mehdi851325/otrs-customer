@@ -17,30 +17,37 @@ const Navbar = () => {
   //     document.documentElement.classList.remove("dark");
   //   }
   // }, [theme]);
-  const [userInfo, setUserInfo] = useState("");
+  const [userInfo, setUserInfo] = useState<string>();
   const [sessionGet] = useSessionGetMutation();
 
   const iconStyle = { color: "gray" };
   useEffect(() => {
     const sessionID = localStorage.getItem("session15000");
-    sessionGet({session :{SessionID: sessionID},port: "15000" }).then((res: any) => {
-      res.data && res.data.data.SessionData.find(
-        (detail: { Key: string; Value: string }) => {
-          if (detail.Key === "UserFullname") {
-            setUserInfo(detail.Value);
-          }
-        }
-      );
-    });
+    sessionGet({ session: { SessionID: sessionID }, port: "15000" }).then(
+      (res: any) => {
+        console.log(res);
+        res.data &&
+          res.data.data.SessionData.find(
+            (detail: { Key: string; Value: string }) => {
+              if (detail.Key === "UserFullname") {
+                setUserInfo(detail.Value);
+              }
+            }
+          );
+      }
+    );
   }, []);
-  const LogOutHandler=()=>{
-    localStorage.removeItem("session15000")
-    navigate("/")
-  }
+  
+  const LogOutHandler = () => {
+    localStorage.removeItem("session15000");
+    localStorage.removeItem("session23000");
+    setUserInfo("");
+    navigate("/");
+  };
   // const darkModeHandler = () => {
   //   setTheme(theme === "dark" ? "light" : "dark");
   // };
-  
+
   return (
     <div className="flex justify-between min-h-20 px-6 items-center font-shabnam">
       <div>
@@ -67,8 +74,13 @@ const Navbar = () => {
               className="min-w-[100px] bg-white rounded-md p-[5px]"
               sideOffset={5}
             >
-              <DropdownMenu.Item onClick={()=>LogOutHandler()} className=" text-[15px] cursor-pointer text-right bg-white leading-none rounded-[3px] flex items-center h-[18px] px-[5px] relative pl-[25px] select-none outline-none">
-                <button className="bg-white text-black font-shabnam">خروج</button>
+              <DropdownMenu.Item
+                onClick={() => LogOutHandler()}
+                className=" text-[15px] cursor-pointer text-right bg-white leading-none rounded-[3px] flex items-center h-[18px] px-[5px] relative pl-[25px] select-none outline-none"
+              >
+                <button className="bg-white text-black font-shabnam">
+                  خروج
+                </button>
               </DropdownMenu.Item>
             </DropdownMenu.Content>
           </DropdownMenu.Root>

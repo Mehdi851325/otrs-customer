@@ -72,6 +72,7 @@ type ticketListQueue={
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({ baseUrl: "https://support-api.si24.ir:15000" }),
+  
   endpoints: (builder) => ({
     sessionLogin: builder.mutation<DataSession,IFormState>({
       query: (sessionarg) => {
