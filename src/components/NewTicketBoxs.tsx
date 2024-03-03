@@ -35,7 +35,7 @@ const NewTicketBoxs = () => {
   ];
 
   return (
-    <div className="bg-primary-50 w-11/12 flex justify-around p-10 rounded-md font-shabnam">
+    <div className="bg-primary-50 w-11/12 flex flex-col lg:flex-row justify-around p-10 rounded-md font-shabnam">
       {boxes.map((box) => (
         <div
           key={box.href}
@@ -45,7 +45,7 @@ const NewTicketBoxs = () => {
             "bg-gray-400 pointer-events-none ":
               box.lable === "Finance" || "Darmanet",
             "bg-secondary-HR pointer-events-auto ": box.lable === "HR",
-            "pr-2 cursor-pointer w-1/5 py-8  flex flex-col m-auto border-2 rounded-2xl":
+            "pr-2 cursor-pointer lg:w-1/5 w-4/5 py-8  flex flex-col m-auto border-2 rounded-2xl":
               true,
           })}
         >
