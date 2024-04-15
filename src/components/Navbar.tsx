@@ -1,7 +1,7 @@
-import { FaUser } from "react-icons/fa";
 import { useSessionGetMutation } from "../redux/features/api/apiSlice";
 import { useEffect, useState } from "react";
 import { DropdownMenu, Text } from "@radix-ui/themes";
+import * as Avatar from "@radix-ui/react-avatar";
 import SideBarMenu from "./SideBarMenu";
 // import { FaRegMoon } from "react-icons/fa";
 // import { FaRegSun } from "react-icons/fa";
@@ -18,26 +18,28 @@ const Navbar = () => {
   //   }
   // }, [theme]);
   const [userInfo, setUserInfo] = useState<string>();
+  const [, setUserLoginInfo] = useState<string>("");
   const [sessionGet] = useSessionGetMutation();
 
-  const iconStyle = { color: "gray" };
   useEffect(() => {
     const sessionID = localStorage.getItem("session15000");
     sessionGet({ session: { SessionID: sessionID }, port: "15000" }).then(
       (res: any) => {
-        console.log(res);
         res.data &&
           res.data.data.SessionData.find(
             (detail: { Key: string; Value: string }) => {
               if (detail.Key === "UserFullname") {
                 setUserInfo(detail.Value);
               }
+              if (detail.Key === "UserLogin") {
+                setUserLoginInfo(detail.Value);
+              }
             }
           );
       }
     );
   }, []);
-  
+
   const LogOutHandler = () => {
     localStorage.removeItem("session15000");
     localStorage.removeItem("session23000");
@@ -55,7 +57,7 @@ const Navbar = () => {
       </div>
 
       <div></div>
-      <div className="flex">
+      <div className="flex items-center">
         {/* <button onClick={() => darkModeHandler()}>
           {theme === "dark" ? (
             <FaRegMoon style={iconStyle} size={25} />
@@ -63,11 +65,18 @@ const Navbar = () => {
             <FaRegSun style={iconStyle} size={25} />
           )}
         </button> */}
-        <button className="border-none flex items-center mr-6">
+        <button className="flex items-center mr-6">
           <DropdownMenu.Root>
-            <DropdownMenu.Trigger className="border-0">
-              <button className="rounded-full w-[35px] h-[35px] inline-flex items-center justify-center bg-white border-0 ring-0">
-                <FaUser style={iconStyle} size={25} />
+            <DropdownMenu.Trigger className="rounded-full">
+              <button className="rounded-full inline-flex items-center justify-center bg-gray-300 ring-0 border-0">
+                <Avatar.Root className=" inline-flex h-[35px] w-[35px] select-none items-center justify-center overflow-hidden rounded-full ring-0 align-middle">
+                  <Avatar.Fallback
+                    className="text-white leading-1 flex h-full w-full items-center justify-center bg-[#043A8C] text-[17px] pb-1 font-semibold ring-0"
+                    delayMs={600}
+                  >
+                    {userInfo?.toUpperCase().slice(0, 1)}
+                  </Avatar.Fallback>
+                </Avatar.Root>
               </button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Content
@@ -84,9 +93,13 @@ const Navbar = () => {
               </DropdownMenu.Item>
             </DropdownMenu.Content>
           </DropdownMenu.Root>
-          {userInfo && (
-            <Text className="font-shabnam pr-6 text-base">{userInfo}</Text>
-          )}
+          <div className="items-center justify-center">
+            {userInfo && (
+              <Text className="font-shabnam pr-4 text-base pb-2">
+                {userInfo}
+              </Text>
+            )}
+          </div>
         </button>
       </div>
     </div>

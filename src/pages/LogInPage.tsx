@@ -1,12 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import saman from "../assets/saman.png";
-import { FormEvent } from "react";
 import { useSessionLoginMutation } from "../redux/features/api/apiSlice";
 import PortApi from "../data/PortApi";
+import { FormEvent } from "react";
+
 
 // interface Data {
 
-const LogIn = () => {
+const LogInPage = () => {
   const navigate = useNavigate();
   const [sessionLogin, { error }] = useSessionLoginMutation();
 
@@ -141,4 +142,4 @@ const LogIn = () => {
   );
 };
 
-export default LogIn;
+export default LogInPage;

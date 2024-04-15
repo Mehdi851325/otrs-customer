@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 
-import ListTicket from "./ListTicket";
-import Navbar from "./Navbar";
-import NewTicketBoxs from "./NewTicketBoxs";
+import ListTicket from "../components/ListTicket";
+import Navbar from "../components/Navbar";
+import NewTicketBoxs from "../components/NewTicketBoxs";
 import {
   useSessionGetMutation,
   useTicketListMutation,
   useTicketSearchMutation,
 } from "../redux/features/api/apiSlice";
-import FieldMessageTicket from "./FieldMessageTicket";
+import FieldMessageTicket from "../components/FieldMessageTicket";
 
 import PortApi from "../data/PortApi";
 
@@ -24,7 +24,7 @@ type Tickets = {
   Age: number;
 };
 
-const Dashboard = () => {
+const DashboardPage = () => {
   const [ticketSearch] = useTicketSearchMutation();
   const [ticketList, { isLoading }] = useTicketListMutation();
   const [sessionGet] = useSessionGetMutation();
@@ -66,7 +66,6 @@ const Dashboard = () => {
                     },
                     port: port.name,
                   }).then((res: any) => {
-                    
                     if (res.data) {
                       setTickets((tickets) => [
                         ...tickets,
@@ -110,4 +109,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default DashboardPage;

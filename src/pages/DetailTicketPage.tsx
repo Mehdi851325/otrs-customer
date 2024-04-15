@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Navbar from "./Navbar";
+import Navbar from "../components/Navbar";
 import { Controller, useForm } from "react-hook-form";
 import { BsExclamationOctagon } from "react-icons/bs";
 //Data
@@ -8,20 +8,20 @@ import {
   useTicketListMutation,
   useTicketUpdateMutation,
 } from "../redux/features/api/apiSlice";
-import QueuesSM from "../data/QueuesSM";
+
 import Priority from "../data/Priority";
 // import StateReply from "../data/StateReply";
 //styled
-import { RiAttachment2 } from "react-icons/ri";
-import { Accordion, AccordionTab } from "primereact/accordion";
-import { Card } from "primereact/card";
+
 import { Button, TextField } from "@radix-ui/themes";
 import { Dropdown } from "primereact/dropdown";
 import { Editor } from "primereact/editor";
 import { FileUpload } from "primereact/fileupload";
 import { Toast } from "primereact/toast";
 import * as Label from "@radix-ui/react-label";
-import { InputTextarea } from "primereact/inputtextarea";
+
+import TicketAccordion from "../components/TicketAccordion";
+import DetailSidebar from "../components/DetailSidebar";
 
 interface FormData {
   description: string;
@@ -32,20 +32,7 @@ interface FormData {
   state: string;
   file: any;
 }
-type Article = {
-  ArticleNumber: number;
-  Subject: string;
-  From: string;
-  To: string;
-  Body: string;
-  Attachment: [Attachment];
-  CreateTime: string;
-};
-interface Attachment {
-  Content: string;
-  Filename: string;
-  ContentType: string;
-}
+
 
 type DetailTicketType = {
   Age: number;
@@ -60,7 +47,7 @@ type Params = {
   id?: string;
   unit: string;
 };
-const DetailTicket = () => {
+const DetailTicketPage = () => {
   const navigate = useNavigate();
   const toast = useRef<Toast>(null);
   const [ticketList] = useTicketListMutation();
@@ -170,187 +157,17 @@ const DetailTicket = () => {
       });
     }
   };
-  const queueName = () => {
-    if (detailTicket) {
-      const findQueueName = QueuesSM.find(
-        (queue) => queue.data === detailTicket.Queue
-      );
-      return findQueueName;
-    }
-  };
+  
 
-  const hrefImage = (base64: Attachment) => {
-    const base64Content = base64.Content;
-    // const sliceBase64 = base64.Content.slice(searchBase64 + 6);
-    return `data:${base64.ContentType};base64,` + base64Content;
-  };
-
-  const dateConvert = (createTime: any): string => {
-    const event = new Date(
-      Date.UTC(
-        createTime.slice(0, 4),
-        createTime.slice(5, 7) - 1,
-        createTime.slice(8, 10),
-        createTime.slice(10, 13),
-        createTime.slice(14, 16),
-        createTime.slice(17, 19)
-      )
-    );
-    return event.toLocaleString("fa-IR-u-nu-latn");
-  };
-
-  const convertSeconds = (seconds: number): string => {
-    const day = Math.floor(seconds / (3600 * 24));
-    const hours = Math.floor((seconds % (3600 * 24)) / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-
-    if (day > 0) {
-      return `${day}روز و ${hours}ساعت `;
-    } else if (hours > 0) {
-      return `${hours} ساعت${hours > 1 ? "" : ""} و ${minutes} دقیقه${
-        minutes > 1 ? "" : ""
-      }`;
-    } else {
-      return `${minutes} دقیقه${minutes > 1 ? "" : ""}`;
-    }
-  };
+ 
   return (
     <>
       <Toast ref={toast} />
       <Navbar />
       <div className="w-full flex justify-center">
-        <div className="w-8/12 flex items-center justify-center">
-          <Accordion pt={{ root: { className: "w-full font-shabnam" } }}>
-            {articles.map((article: Article, index: number) => (
-              <AccordionTab
-                pt={{
-                  header: { className: " rounded-md border-2 my-4" },
-                  headerAction: {
-                    className: "flex-row-reverse text-right px-4",
-                  },
-                  headerTitle: { className: "py-6 px-2" },
-                  headerIcon: { className: "w-8 pr-2" },
-                }}
-                key={article.ArticleNumber}
-                header={article.Subject}
-              >
-                <Card
-                  key={article.ArticleNumber}
-                  pt={{
-                    root: { className: "px-10 py-4" },
-                    footer: { className: "felx justify-end items-end w-full" },
-                  }}
-                  footer={
-                    index === articles.length - 1 && (
-                      <Button
-                        onClick={() => setShowReply(true)}
-                        className="bg-primary-500 cursor-pointer px-8 py-5 text-base font-shabnam"
-                      >
-                        پاسخ
-                      </Button>
-                    )
-                  }
-                >
-                  <div>
-                    <div>
-                      <ul className="py-4 space-y-2">
-                        <li>
-                          <span className="font-bold text-gray-500">
-                            از&nbsp;:&nbsp;
-                          </span>
-                          {article.From}
-                        </li>
-                        {article.To && (
-                          <li>
-                            <span>به&nbsp;:&nbsp;</span>
-                            {article.To}
-                          </li>
-                        )}
-                        <li>
-                          <span className="font-bold text-gray-500">
-                            موضوع&nbsp;:&nbsp;
-                          </span>
-                          {article.Subject}
-                        </li>
-                        <li>
-                          <span className="font-bold text-gray-500">
-                            ایجاد شده&nbsp;:&nbsp;
-                          </span>
-                          {dateConvert(article.CreateTime)}
-                        </li>
-                      </ul>
-                    </div>
-                    <div className="card flex justify-content-center w-full border-t-4 py-2 text-black">
-                      <InputTextarea
-                        autoResize
-                        rows={5}
-                        cols={30}
-                        value={article.Body}
-                        pt={{
-                          root: {
-                            className: "w-full !text-black px-4 py-2 border-2 !text-opacity-100 opacity-100"
-                          }
-                      }}
-                      />
-                    </div>
-                    {article.Attachment && (
-                      <div className="border-t-4 py-4 pr-6 flex text-center items-center">
-                        <a
-                          className="flex items-center bg-slate-300 p-2 rounded-md text-black"
-                          href={hrefImage(article.Attachment[0]) as string}
-                          download={article.Attachment[0].Filename}
-                        >
-                          <RiAttachment2 size={18} />
-                          {article.Attachment[0].Filename}
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                </Card>
-              </AccordionTab>
-            ))}
-          </Accordion>
-        </div>
+        <TicketAccordion articles={articles} setShowReply={setShowReply}/>
         <div className="w-1/12"></div>
-        <div className="w-2/12 h-full border-2 mt-4 rounded-md">
-          <div className="border-b-2 p-2 bg-primary-200">مشخصات درخواست</div>
-          <div className="border-2 p-2 ">
-            {detailTicket && (
-              <ul className="space-y-4">
-                <li>
-                  <span className="font-bold text-gray-500">
-                    شماره&nbsp;&nbsp;:&nbsp;&nbsp;
-                  </span>
-                  {detailTicket.TicketNumber}
-                </li>
-                <li>
-                  <span className="font-bold text-gray-500">
-                    وضعیت&nbsp;&nbsp;:&nbsp;&nbsp;
-                  </span>
-                  {detailTicket.State}
-                </li>
-                <li>
-                  <span className="font-bold text-gray-500">
-                    اولویت&nbsp;&nbsp;:&nbsp;&nbsp;
-                  </span>
-                  {detailTicket.Priority}
-                </li>
-                <li>
-                  <span className="font-bold text-gray-500">
-                    واحد&nbsp;&nbsp;:&nbsp;&nbsp;
-                  </span>
-                  {queueName()?.name}
-                </li>
-                <li>
-                  <span className="font-bold text-gray-500">
-                    زمان&nbsp;&nbsp;:&nbsp;&nbsp;
-                  </span>
-                  {convertSeconds(detailTicket.Age)}
-                </li>
-              </ul>
-            )}
-          </div>
-        </div>
+        <DetailSidebar detailTicket={detailTicket}/>
       </div>
       {showReply && (
         <div className="w-full flex justify-center">
@@ -503,4 +320,4 @@ const DetailTicket = () => {
   );
 };
 
-export default DetailTicket;
+export default DetailTicketPage;

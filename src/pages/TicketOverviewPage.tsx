@@ -1,5 +1,5 @@
 import { TabView, TabPanel } from "primereact/tabview";
-import Navbar from "./Navbar";
+import Navbar from "../components/Navbar";
 import { useEffect, useState } from "react";
 
 import {
@@ -7,8 +7,8 @@ import {
   useTicketListMutation,
   useTicketSearchMutation,
 } from "../redux/features/api/apiSlice";
-import ListTicket from "./ListTicket";
-import FieldMessageTicket from "./FieldMessageTicket";
+import ListTicket from "../components/ListTicket";
+import FieldMessageTicket from "../components/FieldMessageTicket";
 import PortApi from "../data/PortApi";
 
 type Tickets = {
@@ -20,9 +20,10 @@ type Tickets = {
   TicketID?: number;
   Type: string;
   Queue: string;
+  Age: number;
 };
 
-const SenderTicket = () => {
+const TicketOverviewPage = () => {
   const [tickets, setTickets] = useState<Tickets[]>([]);
 
   const [sessionGet] = useSessionGetMutation();
@@ -56,10 +57,12 @@ const SenderTicket = () => {
                   },
                   port: port.name,
                 }).then((res: any) => {
-                  setTickets((tickets) => [
-                    ...tickets,
-                    ...res.data.data.Ticket,
-                  ]);
+                  if (res.data) {
+                    setTickets((tickets) => [
+                      ...tickets,
+                      ...res.data.data.Ticket,
+                    ]);
+                  }
                 });
               });
             }
@@ -73,7 +76,12 @@ const SenderTicket = () => {
     (ticket) => ticket.StateType === "closed"
   );
   const openTicket = tickets.filter(
-    (ticket) => ticket.StateType === "new" || ticket.StateType === "open"
+    (ticket) =>
+      ticket.StateType === "new" ||
+      ticket.StateType === "open" ||
+      ticket.StateType === "pending reminder" ||
+      ticket.StateType === "pending close+" ||
+      ticket.StateType === "pending close-"
   );
 
   return (
@@ -103,4 +111,4 @@ const SenderTicket = () => {
   );
 };
 
-export default SenderTicket;
+export default TicketOverviewPage;

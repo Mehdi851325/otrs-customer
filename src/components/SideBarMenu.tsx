@@ -1,16 +1,16 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Sidebar } from "primereact/sidebar";
 
 import { GiHamburgerMenu } from "react-icons/gi";
 import { Link } from "react-router-dom";
-import { StyleClass } from "primereact/StyleClass";
+// import { StyleClass } from "primereact/StyleClass";
 
-import { TbWorldWww } from "react-icons/tb";
-import { FaUsers } from "react-icons/fa";
+// import { TbWorldWww } from "react-icons/tb";
+// import { FaUsers } from "react-icons/fa";
 
 export default function SideBarMenu() {
   const [visibleRight, setVisibleRight] = useState<boolean>(false);
-  const btnRef3 = useRef<any>(null);
+  // const btnRef3 = useRef<any>(null);
   return (
     <>
       <div className="flex justify-content-center font-shabnam  bg-white dark:bg-gray-800">
@@ -67,6 +67,7 @@ export default function SideBarMenu() {
                       <li className="text-right pt-8">
                         <Link
                           to={"/dashboard"}
+                          reloadDocument
                           className="flex items-center justify-end space-x-4 p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
                         >
                           <span className="ms-3 text-right">داشبورد</span>
@@ -80,18 +81,21 @@ export default function SideBarMenu() {
                           </svg>
                         </Link>
                       </li>
-                      <h5
+                      {/* <h5
                         id="drawer-navigation-label"
                         className="text-base text-right pt-2 font-semibold text-gray-500 uppercase dark:text-gray-400"
                       >
                         درخواست ها
-                      </h5>
-                      {/* <li className="text-right">
+                      </h5> */}
+                      <li className="text-right">
                         <Link
-                          to={"/newticket"}
+                          to={"/newticket/IT"}
+                          reloadDocument
                           className="flex items-center justify-end space-x-4 p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
                         >
-                          <span className="ms-3 text-right">ایجاد درخواست</span>
+                          <span className="ms-3 text-right">
+                            فناوری اطلاعات
+                          </span>
                           <svg
                             fill="currentColor"
                             className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -103,8 +107,27 @@ export default function SideBarMenu() {
                             <path d="M18 10h-4v-4c0-1.104-.896-2-2-2s-2 .896-2 2l.071 4h-4.071c-1.104 0-2 .896-2 2s.896 2 2 2l4.071-.071-.071 4.071c0 1.104.896 2 2 2s2-.896 2-2v-4.071l4 .071c1.104 0 2-.896 2-2s-.896-2-2-2z" />
                           </svg>
                         </Link>
-                      </li> */}
-                      <li>
+                      </li>
+                      <li className="text-right">
+                        <Link
+                          to={"/newticket/HR"}
+                          reloadDocument
+                          className="flex items-center justify-end space-x-4 p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+                        >
+                          <span className="ms-3 text-right">منابع انسانی</span>
+                          <svg
+                            fill="currentColor"
+                            className="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
+                            viewBox="0 0 24 24"
+                            version="1.2"
+                            baseProfile="tiny"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path d="M18 10h-4v-4c0-1.104-.896-2-2-2s-2 .896-2 2l.071 4h-4.071c-1.104 0-2 .896-2 2s.896 2 2 2l4.071-.071-.071 4.071c0 1.104.896 2 2 2s2-.896 2-2v-4.071l4 .071c1.104 0 2-.896 2-2s-.896-2-2-2z" />
+                          </svg>
+                        </Link>
+                      </li>
+                      {/* <li>
                         <StyleClass
                           nodeRef={btnRef3}
                           selector="@next"
@@ -163,10 +186,11 @@ export default function SideBarMenu() {
                             </Link>
                           </li>
                         </ul>
-                      </li>
+                      </li> */}
                       <li className="text-right">
                         <Link
-                          to={"/myticket"}
+                          to={"/TicketOverview"}
+                          reloadDocument
                           className="flex items-center justify-end space-x-4 p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
                         >
                           {/* <span className="inline-flex items-center justify-center w-3 h-3 p-3 ms-3 text-sm font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">
