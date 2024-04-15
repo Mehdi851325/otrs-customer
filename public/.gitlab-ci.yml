@@ -1,0 +1,138 @@
+workflow:
+    rules:
+      - if:  $CI_COMMIT_REF_NAME == "main"
+        variables:
+          REPO_DIR: "production"
+      - if:  $CI_COMMIT_REF_NAME == "develop"
+        variables:
+          REPO_DIR: "develop"
+      - if:  $CI_COMMIT_REF_NAME == "stage"
+        variables:
+          REPO_DIR: "stage"
+      - if:  $CI_COMMIT_REF_NAME == "beta"
+        variables:
+          REPO_DIR: "beta"
+variables:
+  TAG: $CI_PIPELINE_IID
+  GITLAB_PASSWORD: $GITLAB_PASSWORD
+  GITLAB_USER: $GITLAB_USER
+  GIT_STRATEGY: clone
+  
+stages:
+  - build
+  - deploy
+ 
+build-dev-stage:
+  stage: build
+  retry: 2
+  tags:
+    - otrs-customer-stage
+
+  script:
+    - git checkout $CI_COMMIT_REF_NAME
+    - echo ${CI_PROJECT_NAMESPACE}
+#    - ls
+    - docker login -u $DOCKER_USER -p $DOCKER_PASS $DOCKER_URL
+#    - git config --global user.email "deployer@saman.com"
+#    - git config --global user.name "deployer"
+    - docker  build --tag ${DOCKER_URL}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/${REPO_DIR}:$TAG .
+    - docker push ${DOCKER_URL}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/${REPO_DIR}:$TAG
+  only:
+    refs:
+      - develop
+      - stage
+
+
+build-beta-prod:
+  stage: build
+  retry: 2
+  tags:
+    - otrs-customer-prod
+
+  script:
+    - git checkout $CI_COMMIT_REF_NAME
+#    - ls
+    - docker login -u $DOCKER_USER -p $DOCKER_PASS $DOCKER_URL
+#    - git config --global user.email "deployer@saman.com"
+#    - git config --global user.name "deployer"
+    - docker  build --tag ${DOCKER_URL}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/${REPO_DIR}:$TAG .
+    - docker push ${DOCKER_URL}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/${REPO_DIR}:$TAG 
+  only:
+    refs:
+      - main
+      - beta
+       
+deploy-dev:
+  stage: deploy
+  variables:
+    DEPLOYMENT_FILE: otrs-customer-panel.yaml
+  retry: 2
+  tags:
+    - otrs-customer-stage
+
+  script:
+    - rm -rf /tmp/services
+    - cd /tmp/
+    - git clone https://${GITLAB_USER}:${GITLAB_PASSWORD}@cr.si24.ir/kubernetes/services.git
+    - cd ./services/${CI_PROJECT_NAMESPACE}/${REPO_DIR}
+    - 'sed -i "s|image:.*|image: ${DOCKER_URL}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}/${REPO_DIR}:$TAG|g" $DEPLOYMENT_FILE'
+    - git commit -am "change  version to v${TAG} in ${CI_PROJECT_NAMESPACE} ${REPO_DIR} -- deploy by user ${GITLAB_USER_NAME}" && git push origin
+  only:
+    refs:
+      - develop
+deploy-stage:
+  stage: deploy
+  variables:
+    DEPLOYMENT_FILE: otrs-customer-panel.yaml
+  retry: 2
+  tags:
+    - otrs-customer-stage
+
+  script:
+    - rm -rf /tmp/services
+    - cd /tmp/
+    - git clone https://${GITLAB_USER}:${GITLAB_PASSWORD}@cr.si24.ir/kubernetes/services.git
+    - cd ./services/${CI_PROJECT_NAMESPACE}/${REPO_DIR}
+    - 'sed -i "s|image:.*|image: ${DOCKER_URL}/${CI_PROJECT_NAME}/${REPO_DIR}:$TAG|g" $DEPLOYMENT_FILE'
+    - git commit -am "change  version to v${TAG} in ${CI_PROJECT_NAMESPACE} ${REPO_DIR} -- deploy by user ${GITLAB_USER_NAME}" && git push origin
+  only:
+    refs:
+      - stage
+
+deploy-beta:
+  stage: deploy
+  variables:
+    DEPLOYMENT_FILE: otrs-customer-panel.yaml
+  retry: 2
+  tags:
+    - otrs-customer-prod
+
+  script:
+    - rm -rf /tmp/services
+    - cd /tmp/
+    - git clone https://${GITLAB_USER}:${GITLAB_PASSWORD}@cr.si24.ir/kubernetes/services.git
+    - cd ./services/${CI_PROJECT_NAMESPACE}/${REPO_DIR}
+    - 'sed -i "s|image:.*|image: ${DOCKER_URL}/${CI_PROJECT_NAME}/${REPO_DIR}:$TAG|g" $DEPLOYMENT_FILE'
+    - git commit -am "change  version to v${TAG} in ${CI_PROJECT_NAMESPACE} ${REPO_DIR} -- deploy by user ${GITLAB_USER_NAME}" && git push origin
+  only:
+    refs:
+      - beta
+
+deploy-prod:
+  stage: deploy
+  variables:
+    DEPLOYMENT_FILE: otrs-customer-panel.yaml
+  retry: 2
+  tags:
+    - otrs-customer-prod
+
+  script:
+    - rm -rf /tmp/services
+    - cd /tmp/
+    - git clone https://${GITLAB_USER}:${GITLAB_PASSWORD}@cr.si24.ir/kubernetes/services.git
+    - cd ./services/${CI_PROJECT_NAMESPACE}/${REPO_DIR}
+    - 'sed -i "s|image:.*|image: ${DOCKER_URL}/${CI_PROJECT_NAME}/${REPO_DIR}:$TAG|g" $DEPLOYMENT_FILE'
+    - git commit -am " change version to v${TAG} in ${CI_PROJECT_NAMESPACE} ${REPO_DIR} -- deploy by user ${GITLAB_USER_NAME}" && git push origin
+  only:
+    refs:
+      - main

@@ -35,19 +35,21 @@ const NewTicketBoxs = () => {
   ];
 
   return (
-    <div className="bg-gray-300 text-white w-11/12 flex flex-col lg:flex-row justify-around p-10 rounded-md font-shabnam">
+    <div className="lg:bg-gradient-to-t from-gray-400 from-60% to-white to-30% bg-gray-300 w-11/12 flex flex-col lg:flex-row justify-around p-10 rounded-md font-shabnam">
       {boxes.map((box) => (
         <div
           key={box.href}
           onClick={() => navigate(box.href)}
           className={classNames({
-            "bg-[#35374B] pointer-events-auto ": box.lable === "IT",
-            "bg-[#344955] pointer-events-auto ": box.lable === "Darmanet",
-            "bg-[#78A083] pointer-events-auto ": box.lable === "Finance",
-            // "bg-gray-400 pointer-events-none ":
-            //   box.lable === "Finance" || "Darmanet",
-            "bg-[#50727B] pointer-events-auto ": box.lable === "HR",
-            "pr-2 cursor-pointer lg:w-1/5 w-4/5 py-8  flex flex-col m-auto border-2 rounded-2xl":
+            "!bg-[#F1E9FB] pointer-events-auto text-[#441C78] border-[#441C78]":
+              box.lable === "IT",
+            "!bg-[#C3C6CB] pointer-events-none text-gray-600 border-gray-600":
+              box.lable === "Darmanet",
+            "bg-[#C3C6CB] pointer-events-none text-gray-600 border-gray-600":
+              box.lable === "Finance",
+            "!bg-[#FFF9E5] pointer-events-auto text-[#8C6B04] border-[#8C6B04]":
+              box.lable === "HR",
+            "pr-2 cursor-pointer lg:w-1/5 w-4/5 py-8 mt-4  flex flex-col m-auto border rounded-2xl":
               true,
           })}
         >

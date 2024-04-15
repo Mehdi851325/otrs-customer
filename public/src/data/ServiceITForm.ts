@@ -1,0 +1,16 @@
+export default [
+    { name: "نصب نرم‌افزار", code: "01",
+        fields:[{lable:"نام نرم‌افزار" ,id:"01",type:"input"},
+                {lable:"نام کاربری" ,id:"02",type:"input"},
+                ]},
+    { name: "نصب سخت‌افزار", code: "02",
+        fields:[{lable:"توضیحیات درخواست خود را وارد کنید" ,id:"01",type:"text"},
+                ]},
+    { name: "تعمیر سخت‌افزار", code: "03",
+        fields:[{lable:"توضیحات درخواست خود را وارد کنید" ,id:"01",type:"text"},
+                ]},
+    { name: "اصلاح خطای نرم‌افزار", code: "04",
+        fields:[{lable:"نام نرم‌افزار" ,id:"01",type:"input"},
+                {lable:"متن خطا" ,id:"02",type:"input"},
+                ]},
+  ];
