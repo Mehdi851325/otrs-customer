@@ -1,5 +1,5 @@
 import { Accordion, AccordionTab } from "primereact/accordion"
-import { Button } from "primereact/button"
+import { Button } from "@radix-ui/themes";
 import { Card } from "primereact/card"
 import { InputTextarea } from "primereact/inputtextarea"
 import { RiAttachment2 } from "react-icons/ri"
